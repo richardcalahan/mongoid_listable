@@ -20,7 +20,7 @@ module Mongoid
       # @since 0.0.1
       def lists relation, options={}
         meta       = reflect_on_association relation
-        field_name = options[:column] || (meta[:name].to_s + FIELD_SUFFIX).to_sym
+        field_name = options[:column] || (meta[:inverse_of].to_s + FIELD_SUFFIX).to_sym
         klass      = meta.klass
 
         re_define_method "#{relation.to_s.singularize}_ids=" do |ids|
