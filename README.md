@@ -1,6 +1,9 @@
-# MongoidListable
+# Mongoid Listable
 
-TODO: Write a gem description
+Mongoid Listable will eventually be a full replacement library for Mongoid List or Mongoid Orderable. Both 
+libraries fail to accomplish the simple task this library handles: lists that need to be specific for a given `has_many`
+relation.
+
 
 ## Installation
 
@@ -18,7 +21,17 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+    class User
+      include Mongoid::Document
+      include Mongoid:Listable
+    
+      has_many :photos
+      
+      lists :photos
+    
+    end
+
+    
 
 ## Contributing
 
