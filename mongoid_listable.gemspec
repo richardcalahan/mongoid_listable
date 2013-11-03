@@ -7,10 +7,10 @@ Gem::Specification.new do |spec|
   spec.version       = '0.0.1'
   spec.authors       = [ 'richardcalahan' ]
   spec.email         = [ 'richard@calahan.me' ]
-  spec.description   = 'yep'
-  spec.summary       = 'yep'
+  spec.description   = ''
+  spec.summary       = ''
   spec.homepage      = ''
-  spec.license       = 'MITx'
+  spec.license       = 'MIT'
 
   spec.files         = `git ls-files`.split($/)
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
@@ -18,6 +18,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = [ 'lib' ]
 
   spec.add_dependency 'mongoid', '>= 3.1.0'
+  spec.add_dependency 'mongoid-list'
 
   spec.add_development_dependency 'bundler', '~> 1.3'
   spec.add_development_dependency 'rake'
