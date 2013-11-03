@@ -8,7 +8,7 @@ relation.
 
     class User
       include Mongoid::Document
-      include Mongoid:Listable
+      include Mongoid:Lists
     
       has_many :photos
       
