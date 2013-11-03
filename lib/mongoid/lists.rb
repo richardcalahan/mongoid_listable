@@ -30,9 +30,17 @@ module Mongoid
         ids_setter_name = "#{relation.to_s.singularize}_ids="
         ids_setter      = instance_method ids_setter_name
         re_define_method ids_setter_name do |ids|
+          # assign new position int
           ids.each_with_index do |id, index|
             klass.find(id).update_attribute field_name, index + 1
           end
+
+          # unassign old position ints
+          klass.where(meta.foreign_key => id).not_in(id: ids).each do |obj|
+            obj.update_attribute field_name, nil
+          end
+
+          # invoke original method
           ids_setter.bind(self).call(ids)
         end
 
