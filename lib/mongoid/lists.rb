@@ -6,7 +6,11 @@ module Mongoid
 
     extend ActiveSupport::Concern
 
-    FIELD_SUFFIX = '_position'
+    FIELD_SUFFIX = '_position'    
+
+    include do 
+      after_add 
+    end
 
     module ClassMethods
 
@@ -21,14 +25,15 @@ module Mongoid
       def lists relation, options={}
         meta       = reflect_on_association relation
         field_name = options[:column] || (meta[:inverse_of].to_s + FIELD_SUFFIX).to_sym
-        klass      = meta.klass
+        klass      = meta.klass        
 
-        re_define_method "#{relation.to_s.singularize}_ids=" do |ids|
+        ids_setter_name = "#{relation.to_s.singularize}_ids="
+        ids_setter      = instance_method ids_setter_name
+        re_define_method ids_setter_name do |ids|
           ids.each_with_index do |id, index|
             klass.find(id).update_attribute field_name, index + 1
           end
-
-          send(meta.setter, klass.find(ids.reject(&:blank?)))
+          ids_setter.bind(self).call(ids)
         end
 
         meta[:order] = "#{field_name} asc"
