@@ -24,7 +24,7 @@ module Mongoid
       # @since 0.0.1
       def lists relation, options={}
         meta       = reflect_on_association relation
-        field_name = options[:column] || (meta[:inverse_of].to_s + FIELD_SUFFIX).to_sym
+        field_name = options[:column] || (meta.foreign_key.to_s.gsub(/_?id$/, FIELD_SUFFIX)).to_sym
         klass      = meta.klass        
 
         ids_setter_name = "#{relation.to_s.singularize}_ids="
