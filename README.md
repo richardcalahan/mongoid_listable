@@ -78,7 +78,9 @@ You can optionally override the name of the position column:
 
     lists :photos, column: :users_photos_order
 
-There's a lot more to add to the library. At this point, it will conveniently handle rails based multiselect form fields.  
+## Todo
+
+There's a lot more to add to the library! At this point, it conveniently handles standard rails-based multiselect form fields.
 
 ## Installation
 
