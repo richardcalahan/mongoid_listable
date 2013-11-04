@@ -66,7 +66,6 @@ via the standard `order` option to the `has_many` macro.
       class_name: 'User', 
       inverse_of: kodak_moments, 
       foreign_key: :kodaked_by_user_id
-      User.first.photo_ids=["5275428767df6fba82000002", "5275428d67df6fea66000004", ... ]
       ...
     end
     
