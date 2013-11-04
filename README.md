@@ -70,7 +70,7 @@ via the standard `order` option to the `has_many` macro.
     end
     
     
-In this example, there are two `has_many` relations defined between and user and photos. Each photo belonging to a user will 
+In this example, there are two `has_many` relations defined between a user and photos. Each photo belonging to a user will 
 obtain two position fields: `featured_by_user_position` and `kodaked_by_user_position`.
 
 You can optionally override the name of the position column:
