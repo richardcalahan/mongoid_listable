@@ -1,8 +1,8 @@
 # Mongoid Listable
 
 Mongoid Listable will eventually be a full replacement library for Mongoid List or Mongoid Orderable. Both 
-libraries fail to accomplish the simple task this library handles: listable children that need to be specific for a 
-given `has_many` / `belongs_to` relation.
+libraries fail to accomplish the simple task this library handles: separate position scopes for each
+defined `has_many` / `belongs_to` relation.
 
 ## Basic Usage
 
