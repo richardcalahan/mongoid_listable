@@ -30,10 +30,6 @@ module Mongoid
           ids.each_with_index do |id, index|
             meta.klass.find(id).update_attribute field_name, index + 1
           end
-
-          meta.klass.where(meta.foreign_key => id).not_in(id: ids).each do |obj|
-            obj.update_attribute field_name, nil
-          end
         end
 
         meta[:order] ||= "#{field_name} asc"
