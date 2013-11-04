@@ -1,7 +1,7 @@
 module Mongoid
 
   # This module contains the core macro for defining listable has_many relationships
-  # documents. They can be either embedded or referenced (relational).
+  # 
   module Lists
 
     extend ActiveSupport::Concern
