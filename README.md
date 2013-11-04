@@ -22,11 +22,18 @@ given `has_many` / `belongs_to` relation.
       ...
     end
     
-    User.first.photo_ids=["5275428767df6fba82000002", "5275428d67df6fea66000004", ... ]
+In this example photos that are assigned to a user via by the method `user.photo_ids=[ids]` will maintain position based on the index
+of the id in the array argument.
+
+Each photo that belongs to the user will automatically obtain a field called `user_position`. The position field
+is derived from the foreign key of the relation, replacing "_id" with "_position". 
+
+The 1-n relation of a user to their photos will automatically be ordered by `user_position` unless otherwise specified
+via the standard `order` option to the `has_many` macro. 
     
 ## Complex Relations
 
-    # Handles multiple has many relations on same model!
+    # Handles multiple has_many relations on same model!
     
     class User
       include Mongoid::Document
@@ -51,22 +58,23 @@ given `has_many` / `belongs_to` relation.
       include Mongoid::Document
       
       belongs_to :featured_by_user, 
-      class_name
+      class_name: 'User', 
+      inverse_of: featured_photos, 
+      foreign_key: :featured_by_user_id
       
+      belongs_to :kodaked_by_user, 
+      class_name: 'User', 
+      inverse_of: kodak_moments, 
+      foreign_key: :kodaked_by_user_id
+      User.first.photo_ids=["5275428767df6fba82000002", "5275428d67df6fea66000004", ... ]
       ...
     end
     
-    User.first.photo_ids=["5275428767df6fba82000002", "5275428d67df6fea66000004", ... ]
     
-Photos that are assigned to a user via by the method `user.photo_ids=[ids]` will maintain position based on the index
-of the id in the array argument.
+In this example, there are two `has_many` relations defined between and user and photos. Each photo belonging to a user will 
+obtain two position fields: `featured_by_user_position` and `kodaked_by_user_position`.
 
-Each photo that belongs to the user will automatically obtain a field called `user_position`. The position field
-is derived from the foreign key of the relation, replacing "_id" with "_position". 
-
-The 1-n relation of a user to their photos will automatically be ordered by `user_position` unless otherwise specified. 
-
-You can also override the name of the position column:
+You can optionally override the name of the position column:
 
     lists :photos, column: :users_photos_order
 
