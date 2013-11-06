@@ -8,7 +8,7 @@ defined `has_many` / `belongs_to` relation.
 
     class User
       include Mongoid::Document
-      include Mongoid:Lists
+      include Mongoid:Listable
     
       has_many :photos
       lists :photos
@@ -37,7 +37,7 @@ via the standard `order` option to the `has_many` macro.
     
     class User
       include Mongoid::Document
-      include Mongoid:Lists
+      include Mongoid:Listable
     
       has_many :featured_photos, 
       class_name: 'Photo', 
