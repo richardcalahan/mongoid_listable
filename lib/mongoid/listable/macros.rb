@@ -1,12 +1,8 @@
 module Mongoid
+  module Listable
 
-  # This module contains the core macro for defining listable has_many relationships
-  # 
-  module Lists
-
-    extend ActiveSupport::Concern
-
-    module ClassMethods
+    # This module contains the core macro for defining listable has_many relationships
+    module Macros
 
       # Macro to set relation on which to make a list
       #
@@ -52,10 +48,8 @@ module Mongoid
           block.call *args
           original_method.bind(self).call *args
         end
-      end
+      end      
 
     end
-
   end
-
 end

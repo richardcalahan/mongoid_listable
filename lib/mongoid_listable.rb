@@ -1,1 +1,1 @@
-require 'mongoid/lists'
+require 'mongoid/listable'
