@@ -17,7 +17,6 @@ module Mongoid
         field_name = options[:column] || 
           (meta.foreign_key.to_s.gsub(/_?id$/, '_position')).to_sym
         
-
         # Override the default ids setter, first setting the correct position
         # on each relation based on the index of its id in the given array.
         #
