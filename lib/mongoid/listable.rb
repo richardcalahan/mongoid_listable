@@ -2,7 +2,6 @@ require 'mongoid/listable/macros'
 
 module Mongoid
   module Listable
-
     extend ActiveSupport::Concern
 
     included do 
