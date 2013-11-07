@@ -31,6 +31,10 @@ module Mongoid
         meta[:order] ||= "#{field_name} asc"
       end
 
+      def list options={}
+        
+      end
+
       private
 
       # Redefines a method on owner to first execute &block, then
