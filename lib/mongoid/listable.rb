@@ -1,9 +1,7 @@
 require 'mongoid/listable/macros'
 
 module Mongoid
-
   module Listable
-
     extend ActiveSupport::Concern
 
     included do 
@@ -11,5 +9,4 @@ module Mongoid
     end
 
   end
-
 end

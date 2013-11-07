@@ -8,7 +8,7 @@ defined `has_many` / `belongs_to` relation.
 
     class User
       include Mongoid::Document
-      include Mongoid:Lists
+      include Mongoid:Listable
     
       has_many :photos
       lists :photos
@@ -26,7 +26,7 @@ In this example photos that are assigned to a user via by the method `user.photo
 of the id in the array argument.
 
 Each photo that belongs to the user will automatically obtain a field called `user_position`. The position field
-is derived from the foreign key of the relation, replacing "_id" with "_position". 
+is derived from the foreign key of the relation, replacing "\_id" with "_position". 
 
 The 1-n relation of a user to their photos will automatically be ordered by `user_position` unless otherwise specified
 via the standard `order` option to the `has_many` macro. 
@@ -37,7 +37,7 @@ via the standard `order` option to the `has_many` macro.
     
     class User
       include Mongoid::Document
-      include Mongoid:Lists
+      include Mongoid:Listable
     
       has_many :featured_photos, 
       class_name: 'Photo', 
