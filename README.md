@@ -1,4 +1,5 @@
 # Mongoid Listable
+[![Code Climate](https://codeclimate.com/repos/527c1e427e00a44bc100c7e3/badges/344ff1980ca523c67291/gpa.png)](https://codeclimate.com/repos/527c1e427e00a44bc100c7e3/feed)
 
 Mongoid Listable will eventually be a full replacement library for Mongoid List or Mongoid Orderable. Both 
 libraries fail to accomplish the simple task this library handles: separate position scopes for each
