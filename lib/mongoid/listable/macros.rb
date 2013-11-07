@@ -1,7 +1,8 @@
 module Mongoid
   module Listable
 
-    # This module contains the core macro for defining listable has_many relationships
+    # This module contains the core macro for defining listable 
+    # has_many relationships
     module Macros
 
       # Macro to set relation on which to make a list
@@ -9,7 +10,8 @@ module Mongoid
       # @param [ Symbol ] relation The name of the has_many relation
       # @param [ Hash ]   options The options hash
       #
-      # @return [ Mongoid:Relations:Metadata ] Instance of metadata for the relation
+      # @return [ Mongoid:Relations:Metadata ] Instance of metadata for the 
+      # relation
       #
       # @since 0.0.1
       def lists name, options={}
