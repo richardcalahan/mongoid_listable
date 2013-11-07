@@ -5,7 +5,7 @@ module Mongoid
     extend ActiveSupport::Concern
 
     included do 
-      extend Mongoid::Listable::Macros
+      extend Mongoid::Listable::Macros      
     end
 
   end
