@@ -15,10 +15,9 @@ module Mongoid
          ids_method = "#{name.to_s.singularize}_ids="
          redefine_method ids_method do |ids|
            ids.map! &:to_s
-           objects = meta.klass.find(ids.reject(&:blank?)).sort! do |a, b|
-             ids.index(a.id.to_s) <=> ids.index(b.id.to_s)
-           end
-           send meta.setter, objects           
+           objects = meta.klass.find ids.reject(&:blank?)
+           objects.sort! { |a, b| ids.index(a.id.to_s) <=> ids.index(b.id.to_s) } 
+           send meta.setter, objects
          end
          self
        end

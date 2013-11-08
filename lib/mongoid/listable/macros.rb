@@ -22,8 +22,7 @@ module Mongoid
           meta.klass.send :field, field_name(meta), type: Integer
 
           _ids_setter(name, meta)._setter(name, meta)
-            .added(name, "#{name.to_s.singularize}_added", meta)
-            .removed(name, "#{name.to_s.singularize}_removed", meta)
+            .added(name, meta).removed(name, meta)
 
           meta[:order] ||= "#{field_name(meta)} asc"
         end
