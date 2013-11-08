@@ -21,8 +21,10 @@ module Mongoid
 
           meta.klass.send :field, field_name(meta), type: Integer
 
-          _ids_setter(name, meta)._setter(name, meta)
-            .added(name, meta).removed(name, meta)
+          _ids_setter(name, meta)
+            ._setter(name, meta)
+            .added(name, meta)
+            .removed(name, meta)
 
           meta[:order] ||= "#{field_name(meta)} asc"
         end
@@ -67,10 +69,6 @@ module Mongoid
             self.instance_exec original_method, *args, &block
           end        
         end
-
-       def field_name meta
-         (meta.foreign_key.to_s.gsub(/_?id$/, '_position')).to_sym
-       end
 
       end # ClassMethods
 

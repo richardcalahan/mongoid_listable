@@ -1,12 +1,14 @@
 require 'mongoid/listable/accessors'
 require 'mongoid/listable/callbacks'
+require 'mongoid/listable/extensions'
 require 'mongoid/listable/macros'
+
 
 module Mongoid
   module Listable
     extend ActiveSupport::Concern
 
-    included do 
+    included do
       include Mongoid::Listable::Accessors
       include Mongoid::Listable::Callbacks
       include Mongoid::Listable::Macros
