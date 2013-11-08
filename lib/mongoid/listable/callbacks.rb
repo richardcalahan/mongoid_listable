@@ -37,9 +37,10 @@ module Mongoid
           callback = "#{name.to_s.singularize}_removed"
           define_method callback do |object|
             position = object.send field_name(meta)
-            send(name).where(field_name(meta).gt => position)
+            field_name = field_name(meta)
+            send(name).where(field_name.gt => position)
               .each_with_index do |object, index|
-              object.update_attribute field_name(meta), position + index
+              object.update_attribute field_name, position + index
             end
           end
           meta[:before_remove] = callback
