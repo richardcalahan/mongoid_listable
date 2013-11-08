@@ -23,7 +23,7 @@ defined `has_many` / `belongs_to` relation.
       ...
     end
     
-In this example photos that are assigned to a user via by the method `user.photo_ids=[ids]` will maintain position based on the index
+In this example photos that are assigned to a user will maintain position based on the index
 of the id in the array argument.
 
 Each photo that belongs to the user will automatically obtain a field called `user_position`. The position field
@@ -80,7 +80,7 @@ You can optionally override the name of the position column:
 
 ## Todo
 
-There's a lot more to add to the library! At this point, it conveniently handles standard rails-based multiselect form fields.
+There's a lot more to add to the library! At this point, it conveniently handles has many relationships.
 
 ## Installation
 

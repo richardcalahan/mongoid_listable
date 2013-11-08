@@ -3,7 +3,6 @@ require 'mongoid/listable/callbacks'
 require 'mongoid/listable/extensions'
 require 'mongoid/listable/macros'
 
-
 module Mongoid
   module Listable
     extend ActiveSupport::Concern
