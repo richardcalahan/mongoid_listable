@@ -17,52 +17,15 @@ module Mongoid
         #
         # @since 0.0.1
         def lists name, options={}
-          singular_name             = name.to_s.singularize
-          relation_added_callback   = "#{singular_name}_added"
-          relation_removed_callback = "#{singular_name}_removed"
-          meta                      = reflect_on_association name
-          field_name                = options[:column] || 
-            (meta.foreign_key.to_s.gsub(/_?id$/, '_position')).to_sym
+          meta = reflect_on_association name
 
-          meta.klass.send :field, field_name, type: Integer             
+          meta.klass.send :field, field_name(meta), type: Integer
 
-          _ids_setter(name, meta)
+          _ids_setter(name, meta)._setter(name, meta)
+            .added("#{name.to_s.singularize}_added", meta)
+            .removed("#{name.to_s.singularize}_removed", meta)
 
-          # Prepends to the default setter a block that sets the position
-          # attribute on each object according to its index in the array
-          #
-          # @override model#{name}=
-          before_method self, "#{name}=" do |objects|
-            objects.each_with_index do |object, index|
-              object.update_attribute field_name, index + 1
-            end
-
-            (send(name).to_a - objects).each do |object|
-              object.unset field_name
-            end
-          end
-
-          # Defines a mongoid relation after_add callback.
-          # Sets the position attribute to current relations length + 1
-          define_method relation_added_callback do |object|
-            objects = send(name).uniq &:id
-            object.update_attribute field_name, 
-            (objects.index(object) || objects.count) + 1
-          end
-
-          # Defines a mongoid relation before_remove callback.
-          # Resets the position index on all objects that came after
-          define_method relation_removed_callback do |object|
-            position = object.send field_name
-            send(name).where(field_name.gt => position)
-              .each_with_index do |object, index|
-              object.update_attribute field_name, position + index
-            end
-          end
-
-          meta[:order]       ||= "#{field_name} asc"
-          meta[:after_add]     = relation_added_callback
-          meta[:before_remove] = relation_removed_callback
+          meta[:order] ||= "#{field_name} asc"
         end
 
         private
@@ -105,6 +68,10 @@ module Mongoid
             self.instance_exec original_method, *args, &block
           end        
         end
+
+       def field_name meta
+         (meta.foreign_key.to_s.gsub(/_?id$/, '_position')).to_sym         
+       end
 
       end # ClassMethods
 
