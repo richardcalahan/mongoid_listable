@@ -18,14 +18,11 @@ module Mongoid
         # @since 0.0.1
         def lists name, options={}
           meta = reflect_on_association name
-
           meta.klass.send :field, field_name(meta), type: Integer
-
           _ids_setter(name, meta)
             ._setter(name, meta)
             .added(name, meta)
             .removed(name, meta)
-
           meta[:order] ||= "#{field_name(meta)} asc"
         end
 
