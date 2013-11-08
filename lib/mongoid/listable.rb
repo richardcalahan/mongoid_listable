@@ -37,5 +37,9 @@ module Mongoid
       self.class.field_name meta
     end
 
+    def has_many_count name
+      send(name).uniq(&:id).count
+    end
+
   end
 end
