@@ -11,7 +11,6 @@ module Mongoid
         # @param [ String ] method The name of the method to override
         # @param [ Proc ]   &block The block to execute before original method
         #
-        # @private
         # @since 0.0.3
         def before_method owner, method, &block
           original_method = owner.instance_method method
@@ -35,7 +34,6 @@ module Mongoid
         # @param [ String ] method The name of the method to override
         # @param [ Proc ]   &block The block to execute before original method
         #
-        # @private
         # @since 0.0.6
         def around_method owner, method, &block
           original_method = instance_method method
