@@ -1,4 +1,5 @@
 require 'mongoid/listable/accessors'
+require 'mongoid/listable/callbacks'
 require 'mongoid/listable/macros'
 
 module Mongoid
@@ -7,6 +8,7 @@ module Mongoid
 
     included do 
       include Mongoid::Listable::Accessors
+      include Mongoid::Listable::Callbacks
       include Mongoid::Listable::Macros
     end
   end
