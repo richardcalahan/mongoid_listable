@@ -18,9 +18,8 @@ module Mongoid
         def added name, meta
           callback = "#{name.to_s.singularize}_added"
           define_method callback do |object|
-            objects = send(name).uniq &:id
             object.update_attribute field_name(meta), 
-            (objects.index(object) || objects.count) + 1
+            (send(name).uniq(&:id).index(object) || object.class.count) + 1
           end
           meta[:after_add] = callback
           self
