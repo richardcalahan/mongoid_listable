@@ -10,7 +10,12 @@ module Mongoid
         # objects sent to the relation setter corresponds to the order
         # of the array of ids
         #
-        # @override model#{name}_ids=
+        # @param [ Symbol ]   name The name of the has_many relation
+        # @param [ MetaData ] meta The MetaData class
+        #
+        # @return [ Object ] self
+        #
+        # @since 0.0.6
         def _ids_setter name, meta
           ids_method = "#{name.to_s.singularize}_ids="
           redefine_method ids_method do |ids|            
@@ -22,7 +27,12 @@ module Mongoid
         # Prepends to the default setter a block that sets the position
         # attribute on each object according to its index in the array
         #
-        # @override model#{name}=
+        # @param [ Symbol ]   name The name of the has_many relation
+        # @param [ MetaData ] meta The MetaData class
+        #
+        # @return [ Object ] self
+        #
+        # @since 0.0.6
         def _setter name, meta
           before_method self, "#{name}=" do |objects|
             objects.each_with_index do |object, index|
@@ -36,16 +46,6 @@ module Mongoid
           self
         end
 
-        def field_name meta
-          (meta.foreign_key.to_s.gsub(/_?id$/, '_position')).to_sym
-        end
-
-        private
-
-      end # ClassMethods
-
-      def field_name name
-        self.class.field_name name
       end
 
     end
