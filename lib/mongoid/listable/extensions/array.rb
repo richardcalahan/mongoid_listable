@@ -13,7 +13,8 @@ module Mongoid
         # 
         # => [{name: 'Chris'}, {name: 'Richard'}, {name: 'Ashley'}]
         #
-        # @param [ MetaData ] meta The MetaData class
+        # @param [String|Symbol] key    The object attribute to sort by
+        # @param [Array]         values An array of object attributes
         #
         # @return Array
         #
