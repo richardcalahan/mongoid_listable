@@ -38,8 +38,8 @@ module Mongoid
     end
 
     # Counts unique children of object
-    # Needed because the "added" callback doesnt remove
-    # duplicate has_many relations until after invoked.
+    # Needed because the mongoid callbacks dont update
+    # has_many relations until after invoked.
     #
     # @since 0.0.7
     def has_many_count name

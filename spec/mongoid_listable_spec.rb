@@ -17,24 +17,30 @@ describe Mongoid::Listable do
   end
 
   it 'assigns all photos to a user with the default setter' do 
-    @user.photos = Photo.all
+    @user.photos = @photos
     expect(@user.photos.count).to eq(@photos.count)
   end
 
   it 'assigns all photos to a user with the default ids setter' do 
-    ids = Photo.all.pluck :id
+    ids = @photos.collect(&:id)
     @user.photo_ids = ids
     expect(@user.photos.count).to eq(@photos.count)
   end
 
   it 'removes a photo from a user using the delete method' do 
-    @user.photos.delete Photo.first
-    expect(@user.photos.count).to eq(@photos.count - 1)    
+    @user.photos.delete @photos[0]
+    expect(@user.photos.count).to eq(@photos.count - 1)
   end
 
   it 'removes a photo from a user using the default setter' do 
-    @user.photos = Photo.all.limit(5)
+    @user.photos = @photos[0..4]
     expect(@user.photos.count).to eq(@photos.count - 5)
+  end
+
+  it 'updated the position field for all the photos' do 
+    User.first.photos.each_with_index do |photo, index|
+      expect(photo.user_position).to eq(index + 1)
+    end
   end
 
 end
