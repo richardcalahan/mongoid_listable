@@ -27,9 +27,14 @@ describe Mongoid::Listable do
     expect(@user.photos.count).to eq(@photos.count)
   end
 
-  it 'removes a photo from a user' do 
+  it 'removes a photo from a user using the delete method' do 
     @user.photos.delete Photo.first
     expect(@user.photos.count).to eq(@photos.count - 1)    
+  end
+
+  it 'removes a photo from a user using the default setter' do 
+    @user.photos = Photo.all.limit(5)
+    expect(@user.photos.count).to eq(@photos.count - 5)
   end
 
 end
