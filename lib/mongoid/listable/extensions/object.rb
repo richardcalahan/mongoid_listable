@@ -2,8 +2,27 @@ module Mongoid
   module Listable
     module Extensions
 
-      module Module
+      module Object
         
+        # Redefine the method. Will undef the method if it exists or simply
+        # just define it.
+        #
+        # @example Redefine the method.
+        #   Object.re_define_method("exists?") do
+        #     self
+        #   end
+        #
+        # @param [ String, Symbol ] name The name of the method.
+        # @param [ Proc ] block The method body.
+        #
+        # @return [ Method ] The new method.
+        #
+        # # @since 0.0.7
+        def _redefine_method name, &block
+          undef_method(name) if method_defined?(name)
+          define_method(name, &block)
+        end
+
         # Redefines a method on owner to first execute &block, then
         # continue executing original method. 
         #
@@ -12,10 +31,10 @@ module Mongoid
         # @param [ Proc ]   &block The block to execute before original method
         #
         # @since 0.0.3
-        def before_method owner, method, &block
-          original_method = owner.instance_method method
-          owner.re_define_method method do |*args|
-            self.instance_exec *args, &block
+        def before_method name, &block
+          original_method = instance_method name
+          _redefine_method name do |*args|
+            instance_exec *args, &block
             original_method.bind(self).call *args
           end
         end
@@ -35,10 +54,10 @@ module Mongoid
         # @param [ Proc ]   &block The block to execute before original method
         #
         # @since 0.0.6
-        def around_method owner, method, &block
-          original_method = instance_method method
-          owner.re_define_method method do |*args|
-            self.instance_exec original_method, *args, &block
+        def around_method name, &block
+          original_method = instance_method name
+          _redefine_method name do |*args|
+            instance_exec original_method, *args, &block
           end        
         end
 
@@ -48,4 +67,7 @@ module Mongoid
   end
 end
 
-::Module.__send__ :include, Mongoid::Listable::Extensions::Module
+::Object.__send__ :include, Mongoid::Listable::Extensions::Object
+
+
+
