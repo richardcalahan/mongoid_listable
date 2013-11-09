@@ -2,5 +2,11 @@ language: ruby
 services: mongodb
 bundler_args: --without development
 rvm:
-  - 1.9.3
-  - 2.0.0
+- 1.9.3
+- 2.0.0
+deploy:
+  provider: rubygems    
+  api_key:
+    secure: kINb9My7cupQvnOnM212qlghh1344ykkWARX0K+x/nKp4r8hrV4dwhmJy3axoWipHLoUiNcPi+pqZ64B6rjqABbbZH7+SZ4MdrSsdxT/LUBbXKogUrkKOJAzAItRQ7QN+xjpr+HYhZuWHfUhlTbENBjMYdRAODTs4yf4RUfzvDc=
+  on:         
+    tags: true
