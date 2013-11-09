@@ -1,10 +1,11 @@
+require 'mongoid'
+require 'rspec'
+
 if ENV['CI']
   require 'coveralls'
   Coveralls.wear!
 end
 
-require 'mongoid'
-require 'rspec'
 require File.expand_path '../../lib/mongoid_listable', __FILE__
 Dir["#{File.dirname(__FILE__)}/models/*.rb"].each { |file| require file }
 
