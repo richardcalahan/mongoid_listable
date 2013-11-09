@@ -5,8 +5,10 @@ rvm:
 - 1.9.3
 - 2.0.0
 deploy:
-  provider: rubygems    
+  provider: rubygems
   api_key:
-    secure: kINb9My7cupQvnOnM212qlghh1344ykkWARX0K+x/nKp4r8hrV4dwhmJy3axoWipHLoUiNcPi+pqZ64B6rjqABbbZH7+SZ4MdrSsdxT/LUBbXKogUrkKOJAzAItRQ7QN+xjpr+HYhZuWHfUhlTbENBjMYdRAODTs4yf4RUfzvDc=
-  on:         
+    secure: hWkNBQ4LbxAsErQZ8X46SKvCQ2tRwMU/SX2cWPlE0izXPvlpRie7HQvqlcCdmaYhxljxVEOdThMS9UW8rm4e+ykuWic0SD04iod7c9uvQQIxLra49lawOwaRkARRJJXcU5vIs+DXPEODsnRUita2llCf6WNyKbU+4mPacrC+AH4=
+  gem: mongoid_listable
+  on:
     tags: true
+    repo: richardcalahan/mongoid_listable
