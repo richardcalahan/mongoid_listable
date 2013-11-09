@@ -17,7 +17,7 @@ describe Mongoid::Listable do
   end
 
   it 'assigns all photos to a user' do 
-
+    
   end
 
 end
