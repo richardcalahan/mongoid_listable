@@ -8,6 +8,27 @@ module Mongoid
 
       module ClassMethods
 
+        # Macro to set basic position field on an object
+        #
+        # @param [ Hash ]   options The options hash
+        #
+        # @return self
+        #
+        # @since 0.1.0
+        def listed options={}
+          configuration = { column: :position }
+          configuration.merge! options if options.is_a?(Hash)
+
+          field configuration[:column], type: Integer
+
+          created(configuration)
+            .updated(configuration)
+            .destroyed(configuration)
+
+          scope :list, order_by(configuration[:column] => :asc)
+          self
+        end
+
         # Macro to set relation on which to make a list
         #
         # @param [ Symbol ] name The name of the has_many relation

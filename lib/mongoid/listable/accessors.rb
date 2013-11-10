@@ -35,8 +35,9 @@ module Mongoid
         # @since 0.0.6
         def _setter name, meta
           before_method "#{name}=" do |objects|
+            objects ||= []
             objects.each_with_index do |object, index|
-              object.update_attribute field_name(meta), index + 1
+              object.set field_name(meta), index + 1
             end
 
             (send(name).to_a - objects).each do |object|

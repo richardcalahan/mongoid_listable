@@ -7,4 +7,6 @@ class Photo
 
   belongs_to :user
 
+  listed
+
 end

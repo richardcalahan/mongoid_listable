@@ -18,9 +18,11 @@ module Mongoid
         def added name, meta
           callback = "#{name.to_s.singularize}_added"
           define_method callback do |object|
-            object.update_attribute field_name(meta), has_many_count(name)
+            if object[field_name(meta)].nil?
+              object.set field_name(meta), has_many_count(name) + 1
+            end
           end
-          meta[:after_add] = callback
+          meta[:before_add] = callback
           self
         end
 
@@ -41,7 +43,7 @@ module Mongoid
             position = object.send field_name
             send(name).where(field_name.gt => position)
               .each_with_index do |object, index|
-              object.update_attribute field_name, position + index
+              object.set field_name, position + index
             end
             object.unset field_name
           end
@@ -50,9 +52,60 @@ module Mongoid
           self
         end
 
+        # Defines a mongoid before_create callback.
+        # Sets the position field to current object count + 1
+        #
+        # @param [ Hash ] The configuration hash
+        #
+        # @return [ Object ] self
+        #
+        # @since 0.1.0
+        def created configuration          
+          define_method __method__ do             
+            set configuration[:column], self.class.count + 1
+          end
+          before_create __method__
+          self
+        end
+
+        # Defines a mongoid before_update callback.        
+        # If the position column has changed, apply the change.
+        # Hoe the change is applied varies depending on the redrection
+        # of the update.
+        #
+        # @param [ Hash ] The configuration hash
+        #
+        # @return [ Object ] self
+        #
+        # @since 0.1.0
+        def updated configuration
+          define_method __method__ do             
+            column = configuration[:column]            
+            apply_change_on column if send("#{column}_changed?")
+          end
+          before_update __method__
+          self
+        end
+
+        # Defines a mongoid before_destroy callback.        
+        # Resets all sibling object's higher in the list
+        #
+        # @param [ Hash ] The configuration hash
+        #
+        # @return [ Object ] self
+        #
+        # @since 0.1.0
+        def destroyed configuration
+          define_method __method__ do             
+            column = configuration[:column]
+            reposition siblings.gt(column => position), column, position
+          end
+          before_destroy __method__
+          self
+        end
+
       end
 
-    end
-    
+    end    
   end
 end
