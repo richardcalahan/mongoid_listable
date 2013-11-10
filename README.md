@@ -5,7 +5,10 @@
 [![Gem Version](https://badge.fury.io/rb/mongoid_listable.png)](http://badge.fury.io/rb/mongoid_listable)
 
 Mongoid Listable manages lists for isolated collections or for more complex `has_many` / `belongs_to` relationships.
+There are two main macros:   
 
+`listed` for isolated lists not belonging to any parent object.   
+`lists`  for `has_many` / `belongs_to` relationships
 
 
 ## Basic Usage - Isolated
@@ -21,7 +24,6 @@ The `listed` macro will assign a `position` field and a `list` scope to the Phot
 added, updated or removed will trigger automatic reording of all sibling instances.
     
     
-
 ## Basic Usage - Has Many
 
 
@@ -62,7 +64,7 @@ will maintain logical order based on the method used:
 Each photo that belongs to the user will automatically obtain a field called `user_position`. The field
 is derived from the foreign key of the relation, replacing "\_id" with "_position".
 
-The 1-n relation of a user to their photos will automatically be ordered by `user_position` unless otherwise specified
+The `has_many` relation of a user to their photos will automatically be ordered by `user_position` unless otherwise specified
 via the standard `order` option to the `has_many` macro. 
     
 ## Complex Relations
