@@ -19,12 +19,13 @@ module Mongoid
           define_method callback do
             position = send name
             if position.present?
-              siblings = siblings(name).gte(name => position)
+              siblings = siblings(name).gte name => position
               reposition siblings, name, position + 1
             else
               set name, siblings(name).count + 1
             end
           end
+
           before_create callback
           self
         end
@@ -44,6 +45,7 @@ module Mongoid
           define_method callback do       
             apply_change_on name if send("#{name}_changed?")
           end
+
           before_update callback
           self
         end
@@ -59,8 +61,11 @@ module Mongoid
         def destroyed name
           callback = "#{name}_#{__method__}"
           define_method callback do
-            reposition siblings(name).gt(name => self[name]), name, self[name]
+            position = send name
+            siblings = siblings(name).gt(name => position)
+            reposition siblings, name, position
           end
+
           before_destroy callback
           self
         end
@@ -108,6 +113,53 @@ module Mongoid
           self
         end
 
+      end # ClassMethods
+
+      private
+
+      # Applies a position change on column. Which objects are repositioned
+      # depends on the direction of the change.
+      #
+      # @param [ Symbol ] name The name of position column
+      #
+      # @since 0.1.0
+      def apply_change_on name
+        from, to = change_on name
+        siblings = siblings name
+        if to > from
+          reposition siblings.between(name => from..to), name, from
+        elsif to < from       
+          reposition siblings.between(name => to..from), name, to + 1
+        end
+        set name, to
+      end
+
+      # Returns the old and new values for column
+      #
+      # @param [ Symbol ] column The column to retrieve the change
+      # @return [Array] [from, to]
+      #
+      # @since 0.1.0
+      def change_on column
+        from, to = send "#{column}_change"
+        to = safe_to to
+        [from, to]
+      end
+
+      # Ensures the 'to' value is within acceptable bounds
+      #
+      # @param [ Integer ] to The supplied position value
+      # @return [ Integer ] The acceptable position value
+      #
+      # @since 0.1.0
+      def safe_to to
+        if to > self.class.count
+          self.class.count
+        elsif to < 1
+          1
+        else
+          to
+        end
       end
 
     end    

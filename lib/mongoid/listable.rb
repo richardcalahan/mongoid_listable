@@ -60,23 +60,6 @@ module Mongoid
 
     private
 
-    # Applies a position change on column. Which objects are repositioned
-    # depends on the direction of the change.
-    #
-    # @param [ Symbol ] name The name of position column
-    #
-    # @since 0.1.0
-    def apply_change_on name
-      from, to = change_on name
-      siblings = siblings name
-      if to > from
-        reposition siblings.between(name => from..to), name, from
-      elsif to < from       
-        reposition siblings.between(name => to..from), name, to + 1
-      end
-      set name, to
-    end
-
     # Resets column on objects starting at 'start'
     #
     # @param [ Array ] objects The objects to interate
@@ -87,34 +70,6 @@ module Mongoid
     def reposition objects, column, start
       objects.each_with_index do |object, index|
         object.set column, start + index
-      end
-    end
-
-    # Returns the old and new values for column
-    #
-    # @param [ Symbol ] column The column to retrieve the change
-    # @return [Array] [from, to]
-    #
-    # @since 0.1.0
-    def change_on column
-      from, to = send "#{column}_change"
-      to = safe_to to
-      [from, to]
-    end
-
-    # Ensures the 'to' value is within acceptable bounds
-    #
-    # @param [ Integer ] to The supplied position value
-    # @return [ Integer ] The acceptable position value
-    #
-    # @since 0.1.0
-    def safe_to to
-      if to > self.class.count
-        self.class.count
-      elsif to < 1
-        1
-      else
-        to
       end
     end
 
