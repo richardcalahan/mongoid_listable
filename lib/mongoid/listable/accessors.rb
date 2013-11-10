@@ -16,7 +16,7 @@ module Mongoid
         # @return [ Object ] self
         #
         # @since 0.0.6
-        def _ids_setter name, meta
+        def ids_set name, meta
           ids_method = "#{name.to_s.singularize}_ids="
           redefine_method ids_method do |ids|            
             send meta.setter, meta.klass.find(ids).sort_by_attr(:id, ids)
@@ -33,7 +33,7 @@ module Mongoid
         # @return [ Object ] self
         #
         # @since 0.0.6
-        def _setter name, meta
+        def set name, meta
           before_method "#{name}=" do |objects|
             objects ||= []
             objects.each_with_index do |object, index|

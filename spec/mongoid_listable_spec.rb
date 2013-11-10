@@ -1,134 +1,119 @@
 require 'spec_helper'
 
-describe Mongoid::Listable do 
+describe Mongoid::Listable do   
 
-  before :all do 
-    User.create!    
-    10.times { Photo.create }
-  end  
-
-  it 'created a user' do
-    expect(User.first).to be_true
-  end
-
-  it 'created 10 photos' do    
-    expect(Photo.count).to eq(10)
-  end
-
-  it 'added the position field for a photo' do 
-    expect(Photo.instance_methods.include?(:position)).to be_true
-  end
-
-  it 'orders photos' do 
-    Photo.list.each_with_index do |photo, index|
-      expect(photo.position).to eq(index + 1)
+  def ensure_order objects, field
+    objects.each_with_index do |object, index|
+      expect(object[field]).to eq(index + 1)
     end
   end
 
-  it 'updates photo order on position change higher' do
-    photo_a_id = Photo.list[3].id
-    photo_b_id = Photo.list[7].id
+  describe 'listed' do 
 
-    expect(Photo.find(photo_a_id).position).to eq(4)
-    expect(Photo.find(photo_b_id).position).to eq(8)
+    before :all do
+      Photo.destroy_all
+      10.times { Photo.create }
+    end
 
-    Photo.find(photo_a_id).update_attribute :position, 9
+    after :each do 
+      ensure_order Photo.list, :position
+    end
 
-    expect(Photo.find(photo_a_id).position).to eq(9)
-    expect(Photo.find(photo_b_id).position).to eq(7)
-  end
+    it 'adds an object to the beginning of a list on create' do 
+      photo = Photo.create position: 1
+      expect(Photo.list.first.position).to eq(1)
+      expect(photo.id).to eq(Photo.list.first.id)
+    end
 
-  it 'updates photo order on position change lower' do
-    photo_a_id = Photo.list[5].id
-    photo_b_id = Photo.list[9].id
+    it 'adds an object to the middle of a list on create' do 
+      photo = Photo.create position: 5
+      expect(Photo.list[4].position).to eq(5)
+      expect(photo.id).to eq(Photo.list[4].id)
+    end
 
-    expect(Photo.find(photo_a_id).position).to eq(6)
-    expect(Photo.find(photo_b_id).position).to eq(10)
+    it 'adds an object to the end of a list on create' do 
+      photo = Photo.create
+      expect(Photo.list.last.position).to eq(13)
+      expect(photo.id).to eq(Photo.list.last.id)
+    end
 
-    Photo.find(photo_a_id).update_attribute :position, 2
+    it 'updates the position of an object higher' do 
+      photo_id = Photo.list[1].id
+      Photo.list[1].update_attribute :position, 4
+      expect(photo_id).to eq(Photo.list[3].id)
+      expect(Photo.list[3].position).to eq(4)
+    end
 
-    expect(Photo.find(photo_a_id).position).to eq(2)
-    expect(Photo.find(photo_b_id).position).to eq(10)
-  end
+    it 'updates the position of an object lower' do 
+      photo_id = Photo.list[9].id
+      Photo.list[9].update_attribute :position, 2
+      expect(photo_id).to eq(Photo.list[1].id)
+      expect(Photo.list[1].position).to eq(2)      
+    end
 
-  it 'ensures only valid position changes' do
-    photo_a_id = Photo.list[5].id
-    Photo.find(photo_a_id).update_attribute :position, 400
-    expect(Photo.find(photo_a_id).position).to eq(10)
-    Photo.find(photo_a_id).update_attribute :position, -2
-    expect(Photo.find(photo_a_id).position).to eq(1)
-  end
+    it 'updates the position of an object the same' do 
+      photo_id = Photo.list[4].id
+      Photo.list[4].update_attribute :position, 5
+      expect(photo_id).to eq(Photo.list[4].id)
+      expect(Photo.list[4].position).to eq(5)      
+    end
 
-  it 'updates photo order on photo destroy' do
-    photo_a_id = Photo.list[5].id
-    photo_b_id = Photo.list[9].id
+    it 'removes an object from the beginning of a list on destroy' do 
+      Photo.list.first.destroy
+      expect(Photo.list.first.position).to eq(1)
+    end
 
-    expect(Photo.find(photo_b_id).position).to eq(10)
+    it 'removes an object from the middle of a list on destroy' do 
+      Photo.list[6].destroy
+      expect(Photo.list.first.position).to eq(1)
+      expect(Photo.list[6].position).to eq(7)
+      expect(Photo.list.last.position).to eq(11)
+    end
 
-    Photo.find(photo_a_id).destroy
-
-    expect(Photo.find(photo_b_id).position).to eq(9)
-  end
-
-  it 'creates a new photo' do
-    Photo.create
-    expect(Photo.all.count).to eq(10)
-    expect(Photo.last.position).to eq(10)
-  end
-
-  it 'adds photos to a user with the default setter' do 
-    User.first.photos = Photo.all
-    expect(User.first.photos.count).to eq(10)
-  end
-
-  it 'orders photos for a user' do 
-    User.first.photos.each_with_index do |photo, index|
-      expect(photo.user_position).to eq(index + 1)
+    it 'removes an object from the end of a list on destroy' do 
+      Photo.list.last.destroy
+      expect(Photo.list.last.position).to eq(10)
     end
   end
 
-  it 'removes photos from a user' do 
-    User.first.photos = nil
-    expect(User.first.photos.count).to eq(0)
-  end
+  describe 'lists' do 
 
-  it 'adds 5 photos to a user with the default ids setter' do
-    User.first.photo_ids = Photo.all[0..4].map &:id
-    expect(User.first.photos.count).to eq(5)
-  end
+    before :all do
+      User.destroy_all
+      Photo.destroy_all
 
-  it 'adds all photos to a user with the default ids setter' do
-    User.first.photo_ids = Photo.all.map &:id
-    expect(User.first.photos.count).to eq(10)
-  end
-
-  it 'orders photos for a user' do 
-    User.first.photos.each_with_index do |photo, index|
-      expect(photo.user_position).to eq(index + 1)
+      User.create
+      10.times { Photo.create }
     end
-  end
 
-  it 'adds a new photo to a user' do 
-    User.first.photos << Photo.new
-    expect(User.first.photos.count).to eq(11)
-    expect(User.first.photos.last.user_position).to eq(11)
-  end
+    after :each do 
+      ensure_order User.first.photos, :user_position
+    end
 
-  it 'adds a created photo to a user' do 
-    User.first.photos << Photo.create
-    expect(User.first.photos.count).to eq(12)
-    expect(User.first.photos.last.user_position).to eq(12)
-  end
+    it 'sets object list of an owner with the default setter' do 
+      User.first.photos = Photo.all
+    end
 
-  it 'deletes a photo from a user' do 
-    User.first.photos.delete(Photo.all[5])
-    expect(User.first.photos.count).to eq(11)
-    expect(User.first.photos.last.user_position).to eq(11)
-  end
+    it 'sets object list of an owner with the default ids setter' do 
+      ids = Photo.all[2..7].collect(&:id)
+      User.first.photo_ids = ids
+      expect(User.first.photos.count).to eq(6)
+    end
 
-  it 'orders photos for a user' do 
-    User.first.photos.each_with_index do |photo, index|
-      expect(photo.user_position).to eq(index + 1)
+    it 'pushes objects to the list of an owner' do 
+      User.first.photos << Photo.all
+      expect(User.first.photos.count).to eq(10)
+    end
+
+    it 'removes objects from the list of an owner with the default unsetter' do 
+      User.first.photos.delete(Photo.first)
+      expect(User.first.photos.count).to eq(9)
+    end
+
+    it 'removes objects from the list of an owner by destroy' do 
+      Photo.all[3].destroy
+      expect(User.first.photos.count).to eq(8)
+      Photo.first.destroy
     end
   end
 

@@ -49,6 +49,15 @@ module Mongoid
       send(name).uniq(&:id).count
     end
 
+    # Retrieves an object's list siblings
+    #
+    # @return [ Array ]
+    #
+    # @since 0.1.0
+    def siblings field=:position
+      self.class.exists(field => true).ne id: id
+    end
+
     private
 
     # Applies a position change on column. Which objects are repositioned
@@ -57,14 +66,15 @@ module Mongoid
     # @param [ Symbol ] name The name of position column
     #
     # @since 0.1.0
-    def apply_change_on column
-      from, to = change_on column
+    def apply_change_on name
+      from, to = change_on name
+      siblings = siblings name
       if to > from
-        reposition siblings.between(column => from..to), column, from
+        reposition siblings.between(name => from..to), name, from
       elsif to < from       
-        reposition siblings.between(column => to..from), column, to + 1
+        reposition siblings.between(name => to..from), name, to + 1
       end
-      set column, to
+      set name, to
     end
 
     # Resets column on objects starting at 'start'
@@ -106,15 +116,6 @@ module Mongoid
       else
         to
       end
-    end
-
-    # Retrieves an object's list siblings
-    #
-    # @return [ Array ]
-    #
-    # @since 0.1.0
-    def siblings
-      self.class.list.ne id: id
     end
 
   end
