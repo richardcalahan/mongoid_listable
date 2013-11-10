@@ -4,11 +4,26 @@
 [![Coverage Status](https://coveralls.io/repos/richardcalahan/mongoid_listable/badge.png?branch=master)](https://coveralls.io/r/richardcalahan/mongoid_listable?branch=master)
 [![Gem Version](https://badge.fury.io/rb/mongoid_listable.png)](http://badge.fury.io/rb/mongoid_listable)
 
-Mongoid Listable will eventually be a full replacement library for Mongoid List or Mongoid Orderable. Both 
-libraries fail to accomplish the simple task this library handles: separate position scopes for each
-defined `has_many` / `belongs_to` relation.
+Mongoid Listable manages lists for isolated collections or for more complex `has_many` / `belongs_to` relationships.
 
-## Basic Usage
+
+
+## Basic Usage - Isolated
+
+    class Photo
+      include Mongoid::Document
+      include Mongoid::Listable
+      
+      listed
+    end
+    
+The `listed` macro will assign a `position` field and a `list` scope to the Photo class. All Photo instances 
+added, updated or removed will trigger automatic reording of all sibling instances.
+    
+    
+
+## Basic Usage - Has Many
+
 
     class User
       include Mongoid::Document
@@ -26,8 +41,16 @@ defined `has_many` / `belongs_to` relation.
       ...
     end
     
-In this example photos that are assigned to a user will maintain position based on the index
-of the id in the array argument.
+In this example photos that are added to or removed from a user will maintain logical position based on the method used:
+
+    # Default setter
+    User.first.photos = [ photo_a, photo_c, photo_b ]
+    User.first.photos.last == photo_b #=> true
+    
+    # Default ids setter
+    User.first.photo_ids = [ '527fe97c67df6f07e1000003', '527fe97c67df6f07e1000004', '527fe97c67df6f07e1000003' ]
+    User.first.photos[1].id == '527fe97c67df6f07e1000004' #=> true
+   
 
 Each photo that belongs to the user will automatically obtain a field called `user_position`. The position field
 is derived from the foreign key of the relation, replacing "\_id" with "_position". 
