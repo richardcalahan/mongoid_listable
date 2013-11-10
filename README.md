@@ -21,7 +21,7 @@ There are two main macros:
     end
     
 The `listed` macro will assign a `position` field and a `list` scope to the Photo class. All Photo instances 
-added or removed, (or whose position field is updated) will trigger automatic reording of all sibling instances.
+added or removed, (or whose position fields are updated) will trigger automatic reording of all sibling instances.
     
     
 ## Basic Usage - Has Many
