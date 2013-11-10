@@ -41,19 +41,26 @@ added, updated or removed will trigger automatic reording of all sibling instanc
       ...
     end
     
-In this example photos that are added to or removed from a user will maintain logical position based on the method used:
+In this example photos that are added to or removed from a user, or have their position attribute updated
+will maintain logical order based on the method used:
 
-    # Default setter
+    # setter
     User.first.photos = [ photo_a, photo_c, photo_b ]
     User.first.photos.last == photo_b #=> true
     
-    # Default ids setter
+    # ids setter
     User.first.photo_ids = [ '527fe97c67df6f07e1000003', '527fe97c67df6f07e1000004', '527fe97c67df6f07e1000003' ]
     User.first.photos[1].id == '527fe97c67df6f07e1000004' #=> true
-   
+    
+    # push
+    photo = Photo.create
+    User.first.photos << photo
+    User.first.photos.last == photo #=> true
+    
+    
 
-Each photo that belongs to the user will automatically obtain a field called `user_position`. The position field
-is derived from the foreign key of the relation, replacing "\_id" with "_position". 
+Each photo that belongs to the user will automatically obtain a field called `user_position`. The field
+is derived from the foreign key of the relation, replacing "\_id" with "_position".
 
 The 1-n relation of a user to their photos will automatically be ordered by `user_position` unless otherwise specified
 via the standard `order` option to the `has_many` macro. 
