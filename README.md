@@ -67,7 +67,7 @@ is derived from the foreign key of the relation, replacing "\_id" with "_positio
 The `has_many` relation of a user to their photos will automatically be ordered by `user_position` unless otherwise specified
 via the standard `order` option to the `has_many` macro. 
     
-## Complex Relations
+## Advanced Usage - Has Many
 
     # Handles multiple has_many relations on same model!
     
