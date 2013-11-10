@@ -51,6 +51,14 @@ describe Mongoid::Listable do
     expect(Photo.find(photo_b_id).position).to eq(10)
   end
 
+  it 'ensures only valid position changes' do
+    photo_a_id = Photo.list[5].id
+    Photo.find(photo_a_id).update_attribute :position, 400
+    expect(Photo.find(photo_a_id).position).to eq(10)
+    Photo.find(photo_a_id).update_attribute :position, -2
+    expect(Photo.find(photo_a_id).position).to eq(1)
+  end
+
   it 'updates photo order on photo destroy' do
     photo_a_id = Photo.list[5].id
     photo_b_id = Photo.list[9].id
