@@ -113,7 +113,7 @@ You can optionally override the name of the position column:
 
 ## Todo
 
-There's a lot more to add to the library! At this point, it conveniently handles has many relationships.
+Need to test embedded documents.
 
 ## Installation
 
