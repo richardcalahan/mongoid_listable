@@ -17,11 +17,12 @@ module Mongoid
         def created name
           callback = "#{name}_#{__method__}"
           define_method callback do
-            siblings = siblings name
-            if self[name].nil?
-              set name, siblings.count + 1
+            position = send name
+            if position.present?
+              siblings = siblings(name).gte(name => position)
+              reposition siblings, name, position + 1
             else
-              reposition siblings.gte(name => self[name]), name, self[name] + 1
+              set name, siblings(name).count + 1
             end
           end
           before_create callback
