@@ -48,7 +48,7 @@ created, destroyed, or have their position field updated will trigger a reording
     end
     
 In this example photos that are added to or removed from a user's collection, or have their position attribute updated
-will will trigger a reordering of all sibling instances. For example:
+will trigger a reordering of all sibling instances. For example:
 
     # setter
     User.first.photos = [ photo_a, photo_c, photo_b ]
