@@ -17,10 +17,10 @@ module Mongoid
         def created name
           callback = "#{name}_#{__method__}"
           define_method callback do
-            position = send name
+            position = send(name)
             if position.present?
-              siblings = siblings(name).gte name => position
-              reposition siblings, name, position + 1
+              siblings = siblings name
+              reposition siblings.gte(name => position), name, position + 1
             else
               set name, siblings(name).count + 1
             end
@@ -45,7 +45,6 @@ module Mongoid
           define_method callback do       
             apply_change_on name if send("#{name}_changed?")
           end
-
           before_update callback
           self
         end
@@ -82,11 +81,16 @@ module Mongoid
         def added name, meta
           callback = "#{name.to_s.singularize}_added"
           define_method callback do |object|
-            if object[field_name(meta)].nil?
-              object.set field_name(meta), has_many_count(name) + 1
+            return unless object.new_record?
+            field_name = field_name(meta)
+            if position = object.send(field_name) 
+              objects = object.siblings(field_name).gte(field_name => position)
+              reposition objects, field_name, position + 1
+            else                       
+              object.set field_name, has_many_count(name)
             end
           end
-          meta[:before_add] = callback
+          meta[:after_add] = callback
           self
         end
 
@@ -109,7 +113,7 @@ module Mongoid
             object.unset field_name
           end
 
-          meta[:before_remove] = callback
+          meta[:after_remove] = callback
           self
         end
 
@@ -140,26 +144,17 @@ module Mongoid
       # @return [Array] [from, to]
       #
       # @since 0.1.0
-      def change_on column
-        from, to = send "#{column}_change"
-        to = safe_to to
+      def change_on name
+        from, to = send "#{name}_change"
+        from ||= 0
+        to = if to > siblings(name).count + 1
+               siblings(name).count + 1
+             elsif to < 1
+               1
+             else
+               to
+             end
         [from, to]
-      end
-
-      # Ensures the 'to' value is within acceptable bounds
-      #
-      # @param [ Integer ] to The supplied position value
-      # @return [ Integer ] The acceptable position value
-      #
-      # @since 0.1.0
-      def safe_to to
-        if to > self.class.count
-          self.class.count
-        elsif to < 1
-          1
-        else
-          to
-        end
       end
 
     end    

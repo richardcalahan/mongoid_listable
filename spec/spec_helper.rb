@@ -7,8 +7,12 @@ if ENV['CI']
 end
 
 require File.expand_path '../../lib/mongoid_listable', __FILE__
+require File.expand_path '../../spec/models/item',     __FILE__
 require File.expand_path '../../spec/models/photo',    __FILE__
 require File.expand_path '../../spec/models/user',     __FILE__
+require File.expand_path '../../spec/models/section',  __FILE__
+require File.expand_path '../../spec/models/article',  __FILE__
+
 
 Mongoid.configure do |config|
   config.connect_to 'mongoid_listable_test'

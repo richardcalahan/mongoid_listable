@@ -37,6 +37,7 @@ module Mongoid
         def set name, meta
           before_method "#{name}=" do |objects|
             objects ||= []
+
             reposition objects, field_name(meta), 1
 
             (send(name).to_a - objects).each do |object|

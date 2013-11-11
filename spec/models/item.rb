@@ -1,10 +1,8 @@
-class Photo
+class Item
 
   include Mongoid::Document
   include Mongoid::Listable
 
-  field :caption, type: String
-
-  belongs_to :user
+  listed
 
 end

@@ -55,7 +55,8 @@ module Mongoid
     #
     # @since 0.1.0
     def siblings field=:position
-      self.class.exists(field => true).ne id: id
+      klass = embedded? ? _parent.send(metadata.key) : self.class
+      klass.exists(field => true).ne id: id
     end
 
     private

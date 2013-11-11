@@ -1,10 +1,10 @@
-class Photo
+class Article
 
   include Mongoid::Document
   include Mongoid::Listable
 
-  field :caption, type: String
+  embeds_many :sections
 
-  belongs_to :user
+  lists :sections
 
 end

@@ -10,154 +10,306 @@ describe Mongoid::Listable do
 
   describe 'listed' do 
 
-    before :all do
-      Photo.destroy_all
-      10.times { Photo.create }
+    before :each do
+      Item.destroy_all
+      10.times { Item.create! }
     end
 
     after :each do 
-      ensure_order Photo.list, :position
+      ensure_order Item.list, :position
     end
 
-    it 'adds an object to the beginning of a list on create' do 
-      photo = Photo.create position: 1
-      expect(Photo.list.first.position).to eq(1)
-      expect(photo.id).to eq(Photo.list.first.id)
+    it 'should have a position field' do 
+      expect(Item.fields.key?('position')).to be_true
     end
 
-    it 'adds an object to the middle of a list on create' do 
-      photo = Photo.create position: 5
-      expect(Photo.list[4].position).to eq(5)
-      expect(photo.id).to eq(Photo.list[4].id)
+    it 'should have a list scope' do 
+      expect(Item.scopes.key?(:list)).to be_true
     end
 
-    it 'adds an object to the end of a list on create' do 
-      photo = Photo.create
-      expect(Photo.list.last.position).to eq(13)
-      expect(photo.id).to eq(Photo.list.last.id)
+    it 'should append new object at position 1' do
+      item = Item.create position: 1
+      expect(item.position).to eq(1)
     end
 
-    it 'updates the position of an object higher' do 
-      photo_id = Photo.list[1].id
-      Photo.list[1].update_attribute :position, 4
-      expect(photo_id).to eq(Photo.list[3].id)
-      expect(Photo.list[3].position).to eq(4)
+    it 'should append new object at position 5' do
+      item = Item.create position: 5
+      expect(item.position).to eq(5)
     end
 
-    it 'updates the position of an object lower' do 
-      photo_id = Photo.list[9].id
-      Photo.list[9].update_attribute :position, 2
-      expect(photo_id).to eq(Photo.list[1].id)
-      expect(Photo.list[1].position).to eq(2)      
+    it 'should append new object at end of list' do
+      item = Item.create
+      expect(item.position).to eq(11)
     end
 
-    it 'updates the position of an object the same' do 
-      photo_id = Photo.list[4].id
-      Photo.list[4].update_attribute :position, 5
-      expect(photo_id).to eq(Photo.list[4].id)
-      expect(Photo.list[4].position).to eq(5)      
+    it 'should maintain order when removing object at position 1' do
+      Item.list.first.destroy
     end
 
-    it 'removes an object from the beginning of a list on destroy' do 
-      Photo.list.first.destroy
-      expect(Photo.list.first.position).to eq(1)
+    it 'should maintain order when removing object at position 5' do
+      Item.where(position: 5).destroy
     end
 
-    it 'removes an object from the middle of a list on destroy' do 
-      Photo.list[6].destroy
-      expect(Photo.list.first.position).to eq(1)
-      expect(Photo.list[6].position).to eq(7)
-      expect(Photo.list.last.position).to eq(11)
+    it 'should maintain order when removing object at position 10' do
+      Item.list.last.destroy
     end
 
-    it 'removes an object from the end of a list on destroy' do 
-      Photo.list.last.destroy
-      expect(Photo.list.last.position).to eq(10)
+    it 'should maintain order when moving object from position 1 to 5' do
+      item = Item.list.first
+      item.update_attribute :position, 5
+      expect(Item.list.where(position: 5).first).to eq(item)
     end
+
+    it 'should maintain order when moving object from position 10 to 5' do
+      item = Item.list.last
+      item.update_attribute :position, 5
+      expect(Item.list.where(position: 5).first).to eq(item)
+    end
+
+    it 'should maintain order when moving object from position 2 to 6' do
+      item = Item.list.where(position: 2).first
+      item.update_attribute :position, 6
+      expect(Item.list.where(position: 6).first).to eq(item)
+    end
+
+    it 'should maintain order when moving object from position 8 to 4' do
+      item = Item.list.where(position: 8).first
+      item.update_attribute :position, 4
+      expect(Item.list.where(position: 4).first).to eq(item)
+    end
+
+    it 'should do nothing when assigning object to same position' do
+      item = Item.list.where(position: 5).first
+      item.update_attribute :position, 5
+      expect(Item.list.where(position: 5).first).to eq(item)
+    end
+
+    it 'should compensate for updated positions that are higher than bounds' do
+      item = Item.list.where(position: 5).first
+      item.update_attribute :position, 100
+      expect(Item.list.last).to eq(item)
+    end
+
+    it 'should compensate for updated positions that are lower than bounds' do
+      item = Item.list.where(position: 5).first
+      item.update_attribute :position, -100
+      expect(Item.list.first).to eq(item)
+    end
+
   end
 
-  describe 'lists' do 
+  describe 'lists' do
+    
+    describe 'embedded' do
 
-    before :all do
-      User.destroy_all
-      Photo.destroy_all
-
-      User.create
-      10.times { Photo.create }
-    end
-
-    after :each do 
-      ensure_order User.first.photos, :user_position
-    end
-
-    it 'sets object list of an owner with the default setter' do
-      photos = Photo.all
-      User.first.photos = photos
-      photos.each_with_index do |photo, index|
-        expect(photo.id).to eq(User.first.photos[index].id)
+      before :each do
+        Article.destroy_all
+        Article.create!
+        10.times { Article.first.sections.create! }
       end
-      expect(User.first.photos.count).to eq(Photo.count)
-    end
 
-    it 'sets object list of an owner with the default ids setter' do 
-      ids = Photo.all[2..7].collect(&:id)
-      User.first.photo_ids = ids
-      ids.each_with_index do |id, index|
-        expect(id).to eq(User.first.photos[index].id)
+      after :each do 
+        ensure_order Article.first.sections, :article_position
       end
-      expect(User.first.photos.count).to eq(6)
+
+      it 'should have a position field' do 
+        expect(Section.fields.key?('article_position')).to be_true
+      end
+
+      it 'should append new objects with the default setter' do 
+        sections = 10.times.collect { Section.new }
+        sections.reverse!
+        Article.first.sections = sections
+
+        Article.first.sections.each_with_index do |section, index|
+          expect(section.id).to eq(sections[index].id)
+        end
+      end
+
+      it 'should append new object at position 1' do 
+        section = Article.first.sections.create article_position: 1
+        expect(section.article_position).to eq(1)
+      end
+
+      it 'should append new object at position 5' do 
+        section = Article.first.sections.create article_position: 5        
+        expect(section.article_position).to eq(5)
+      end
+
+      it 'should append new object at end of list' do
+        section = Article.first.sections.create!
+        expect(section.article_position).to eq(11)
+      end
+
+      it 'should maintain order when removing object at position 1' do
+        Article.first.sections.first.destroy        
+      end
+
+      it 'should maintain order when removing object at position 5' do
+        Article.first.sections.where(article_position: 5).first.destroy
+      end
+
+      it 'should maintain order when removing object at position 10' do
+        Article.first.sections.where(article_position: 10).first.destroy
+      end
+
+      it 'should maintain order when moving object from position 1 to 5' do
+        section = Article.first.sections.where(article_position: 1).first
+        section.update_attribute :article_position, 5
+        expect(Article.first.sections.where(article_position: 5).first).to eq(section)
+      end
+
+      it 'should maintain order when moving object from position 10 to 5' do
+        section = Article.first.sections.where(article_position: 10).first
+        section.update_attribute :article_position, 5
+        expect(Article.first.sections.where(article_position: 5).first).to eq(section)
+      end
+
+      it 'should maintain order when moving object from position 2 to 6' do
+        section = Article.first.sections.where(article_position: 2).first
+        section.update_attribute :article_position, 6
+        expect(Article.first.sections.where(article_position: 6).first).to eq(section)
+      end
+
+      it 'should maintain order when moving object from position 8 to 4' do
+        section = Article.first.sections.where(article_position: 8).first
+        section.update_attribute :article_position, 4
+        expect(Article.first.sections.where(article_position: 4).first).to eq(section)
+      end
+
+      it 'should do nothing when assigning object to same position' do
+        section = Article.first.sections.where(article_position: 5).first
+        section.update_attribute :article_position, 5
+        expect(Article.first.sections.where(article_position: 5).first).to eq(section)
+      end
+
+      it 'should compensate for updated positions that are higher than bounds' do 
+        section = Article.first.sections.where(article_position: 5).first
+        section.update_attribute :article_position, 100
+        expect(Article.first.sections.last).to eq(section)
+      end
+
+      it 'should compensate for updated positions that are lower than bounds' do 
+        section = Article.first.sections.where(article_position: 5).first
+        section.update_attribute :article_position, -100
+        expect(Article.first.sections.first).to eq(section)
+      end
+      
     end
 
-    it 'pushes objects to the list of an owner' do 
-      User.first.photos << Photo.all
-      expect(User.first.photos.count).to eq(10)
+    describe 'referenced' do
+
+      before :each do
+        User.destroy_all
+        Photo.destroy_all
+        User.create!
+        10.times { User.first.photos.create! }
+      end
+
+      after :each do 
+        ensure_order User.first.photos, :user_position
+      end
+
+      it 'should have a position field' do 
+        expect(Photo.fields.key?('user_position')).to be_true
+      end
+
+      it 'should append new object at position 1' do 
+        photo = User.first.photos.create user_position: 1
+        expect(photo.user_position).to eq(1)
+      end
+
+      it 'should append new object at position 5' do 
+        photo = User.first.photos.create user_position: 5
+        expect(photo.user_position).to eq(5)
+      end
+
+      it 'should append new object at end of list' do
+        user = User.first.photos.create!
+        expect(user.user_position).to eq(11)
+      end
+
+      it 'should add new objects with the default setter' do
+        photos = 15.times.collect { Photo.create }
+
+        photos.reverse!
+
+        User.first.photos = photos
+        
+        expect(User.first.photos.count).to eq(15)
+
+        User.first.photos.each_with_index do |photo, index|
+          expect(photos[index].id).to eq(photo.id)
+        end
+      end
+
+      it 'should add new objects with the default ids setter' do
+        ids = 15.times.collect { Photo.create.id }
+
+        User.first.photo_ids = ids
+        expect(User.first.photos.count).to eq(15)
+
+        User.first.photos.each_with_index do |photo, index|
+          expect(ids[index]).to eq(User.first.photos[index].id)
+        end
+      end
+
+      it 'should maintain order when removing object at position 1' do
+        User.first.photos.first.destroy        
+      end
+
+      it 'should maintain order when removing object at position 5' do
+        User.first.photos.where(user_position: 5).first.destroy
+      end
+
+      it 'should maintain order when removing object at position 10' do
+        User.first.photos.where(user_position: 10).first.destroy
+      end
+
+      it 'should maintain order when moving object from position 1 to 5' do
+        photo = User.first.photos.where(user_position: 1).first
+        photo.update_attribute :user_position, 5
+        expect(User.first.photos.where(user_position: 5).first).to eq(photo)
+      end
+
+      it 'should maintain order when moving object from position 10 to 5' do
+        photo = User.first.photos.where(user_position: 10).first
+        photo.update_attribute :user_position, 5
+        expect(User.first.photos.where(user_position: 5).first).to eq(photo)
+      end
+
+      it 'should maintain order when moving object from position 2 to 6' do
+        photo = User.first.photos.where(user_position: 2).first
+        photo.update_attribute :user_position, 6
+        expect(User.first.photos.where(user_position: 6).first).to eq(photo)
+      end
+
+      it 'should maintain order when moving object from position 8 to 4' do
+        photo = User.first.photos.where(user_position: 8).first
+        photo.update_attribute :user_position, 4
+        expect(User.first.photos.where(user_position: 4).first).to eq(photo)
+      end
+
+      it 'should do nothing when assigning object to same position' do
+        photo = User.first.photos.where(user_position: 5).first
+        photo.update_attribute :user_position, 5
+        expect(User.first.photos.where(user_position: 5).first).to eq(photo)
+      end
+
+      it 'should compensate for updated positions that are higher than bounds' do 
+        photo = User.first.photos.where(user_position: 5).first
+        photo.update_attribute :user_position, 100
+        expect(User.first.photos.last).to eq(photo)
+      end
+
+      it 'should compensate for updated positions that are lower than bounds' do 
+        photo = User.first.photos.where(user_position: 5).first
+        photo.update_attribute :user_position, -100
+        expect(User.first.photos.first).to eq(photo)
+      end
+
     end
 
-    it 'updates the position of an object higher' do 
-      photo_id = User.first.photos[4].id
-      Photo.find(photo_id).update_attribute :user_position, 6
-      expect(photo_id).to eq(User.first.photos[5].id)
-      expect(User.first.photos[5].user_position).to eq(6)
-    end
-
-    it 'updates the position of an object lower' do 
-      photo_id = User.first.photos[4].id
-      Photo.find(photo_id).update_attribute :user_position, 1
-      expect(photo_id).to eq(User.first.photos[0].id)
-      expect(User.first.photos[0].user_position).to eq(1)
-    end
-
-    it 'updates the position of an object the same' do 
-      photo_id = User.first.photos[4].id
-      Photo.find(photo_id).update_attribute :user_position, 5
-      expect(photo_id).to eq(User.first.photos[4].id)
-      expect(User.first.photos[4].user_position).to eq(5)
-    end
-
-    it 'updates the position of an object out of bounds high' do 
-      photo_id = User.first.photos[4].id
-      Photo.find(photo_id).update_attribute :user_position, 1000
-      expect(photo_id).to eq(User.first.photos.last.id)
-      expect(User.first.photos.last.user_position).to eq(User.first.photos.count)
-    end
-
-    it 'updates the position of an object out of bounds low' do 
-      photo_id = User.first.photos[4].id
-      Photo.find(photo_id).update_attribute :user_position, -2
-      expect(photo_id).to eq(User.first.photos.first.id)
-      expect(User.first.photos.first.user_position).to eq(1)
-    end
-
-    it 'removes objects from the list of an owner with the default unsetter' do 
-      User.first.photos.delete(Photo.first)
-      expect(User.first.photos.count).to eq(9)
-    end
-
-    it 'removes objects from the list of an owner by destroy' do 
-      Photo.all[3].destroy
-      expect(User.first.photos.count).to eq(8)
-      Photo.first.destroy
-    end
   end
 
 end

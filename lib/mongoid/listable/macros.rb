@@ -15,17 +15,14 @@ module Mongoid
         # @return self
         #
         # @since 0.1.0
-        def listed options={}
-          configuration = { field_name: :position }
-          configuration.merge! options if options.is_a?(Hash)
+        def listed
+          field :position, type: Integer
 
-          field_name = configuration[:field_name]
+          created(:position)
+            .updated(:position)
+            .destroyed(:position)
 
-          field field_name, type: Integer
-
-          created(field_name).updated(field_name).destroyed(field_name)
-
-          scope :list, order_by(field_name => :asc)
+          scope :list, order_by(:position => :asc)
           self
         end
 
@@ -39,11 +36,14 @@ module Mongoid
         # @since 0.0.1
         def lists name, options={}
           meta = reflect_on_association name
+
           field_name = field_name(meta)
           meta.klass.send :field, field_name, type: Integer
+
           ids_set(name, meta).set(name, meta)
             .added(name, meta).removed(name, meta)
 
+          meta.klass.send :include, Mongoid::Listable
           meta.klass.updated(field_name).destroyed(field_name)
 
           meta[:order] ||= "#{field_name(meta)} asc"
