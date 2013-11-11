@@ -114,10 +114,6 @@ In this example, there are two `has_many` relations defined between a user and p
 obtain two position fields: `featured_by_user_position` and `kodaked_by_user_position`.
 
 
-## Todo
-
-Need to test embedded documents.
-
 ## Installation
 
 Add this line to your application's Gemfile:
