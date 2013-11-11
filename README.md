@@ -66,9 +66,10 @@ will trigger a reordering of all sibling instances. For example:
     
 
 Each photo that belongs to the user will automatically obtain a field called `user_position`. The field name
-is derived from the foreign key of the relation, replacing "\_id" with "_position".
+is derived from the foreign key of the relation, replacing "\_id" with "_position". Having a unique position key
+for each 1-n relationship allows for more complex lists.  
 
-The `has_many` / `embeds_many` relationship of a user to their photos will automatically be ordered by `user_position` unless otherwise specified
+The `has_many` / `embeds_many` relationship of a user to their photos will automadtically be ordered by `user_position` unless otherwise specified
 via the standard `order` option to the `has_many` macro. 
     
 ## Advanced Usage - Has Many / Embeds Many
