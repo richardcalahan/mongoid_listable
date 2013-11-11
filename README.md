@@ -1,5 +1,5 @@
 # Mongoid Listable
-[![Code Climate](https://codeclimate.com/repos/527c1e427e00a44bc100c7e3/badges/344ff1980ca523c67291/gpa.png)](https://codeclimate.com/repos/527c1e427e00a44bc100c7e3/feed)
+[![Code Climate](https://codeclimate.com/github/richardcalahan/mongoid_listable.png)](https://codeclimate.com/github/richardcalahan/mongoid_listable)
 [![Build Status](https://travis-ci.org/richardcalahan/mongoid_listable.png?branch=master)](https://travis-ci.org/richardcalahan/mongoid_listable)
 [![Coverage Status](https://coveralls.io/repos/richardcalahan/mongoid_listable/badge.png?branch=master)](https://coveralls.io/r/richardcalahan/mongoid_listable?branch=master)
 [![Gem Version](https://badge.fury.io/rb/mongoid_listable.png)](http://badge.fury.io/rb/mongoid_listable)
