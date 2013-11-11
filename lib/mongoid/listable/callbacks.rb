@@ -104,9 +104,9 @@ module Mongoid
         #
         # @since 0.0.6
         def removed name, meta       
-          field_name = field_name meta
           callback   = "#{name.to_s.singularize}_removed"
           define_method callback do |object|
+            field_name = field_name meta
             position = object.send field_name
             reposition object.siblings(field_name).gt(field_name => position), 
             field_name, position

@@ -145,6 +145,11 @@ describe Mongoid::Listable do
         Article.first.sections.first.destroy        
       end
 
+      it 'should maintain order when removing object at position 2' do
+        section = Article.first.sections.where(article_position: 2).first
+        Article.first.sections.delete(section)
+      end
+
       it 'should maintain order when removing object at position 5' do
         Article.first.sections.where(article_position: 5).first.destroy
       end
@@ -256,6 +261,11 @@ describe Mongoid::Listable do
 
       it 'should maintain order when removing object at position 1' do
         User.first.photos.first.destroy        
+      end
+
+      it 'should maintain order when removing object at position 2' do
+        photo = User.first.photos.where(user_position: 2).first
+        User.first.photos.delete(photo)
       end
 
       it 'should maintain order when removing object at position 5' do
