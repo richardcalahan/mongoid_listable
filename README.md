@@ -4,11 +4,12 @@
 [![Coverage Status](https://coveralls.io/repos/richardcalahan/mongoid_listable/badge.png?branch=master)](https://coveralls.io/r/richardcalahan/mongoid_listable?branch=master)
 [![Gem Version](https://badge.fury.io/rb/mongoid_listable.png)](http://badge.fury.io/rb/mongoid_listable)
 
-Mongoid Listable manages lists for isolated collections or for more complex `has_many` / `belongs_to` relationships.
+Mongoid Listable is a library for managing listable relations. It works great for isolated collections or for more complex `has_many` / `embeds_many` relationships.
+
 There are two main macros:   
 
-`listed` for isolated lists not belonging to any parent object.   
-`lists`  for `has_many` / `belongs_to` relationships
+* `listed` for isolated lists that do not belong to any parent objects.   
+* `lists`  for `has_many` / `embeds_many` relationships.
 
 
 ## Basic Usage - Isolated
@@ -20,11 +21,11 @@ There are two main macros:
       listed
     end
     
-The `listed` macro will assign a `position` field and a `list` scope to the Photo class. All Photo instances 
-added or removed, (or whose position fields are updated) will trigger automatic reording of all sibling instances.
+The `listed` macro will assign a `position` field and a `list` scope to the Photo class. All Photo instances that are
+created, destroyed, or have their position field updated will trigger a reording of all sibling instances. 
     
     
-## Basic Usage - Has Many
+## Basic Usage - Has Many / Embeds Many
 
 
     class User
@@ -32,6 +33,8 @@ added or removed, (or whose position fields are updated) will trigger automatic 
       include Mongoid:Listable
     
       has_many :photos
+      # or embeds_many :photos
+      
       lists :photos
       ...
     end
@@ -40,11 +43,12 @@ added or removed, (or whose position fields are updated) will trigger automatic 
       include Mongoid::Document
       
       belongs_to :user
+      # or embedded_in :user
       ...
     end
     
-In this example photos that are added to or removed from a user, or have their position attribute updated
-will maintain logical order based on the method used:
+In this example photos that are added to or removed from a user's collection, or have their position attribute updated
+will will trigger a reordering of all sibling instances. For example:
 
     # setter
     User.first.photos = [ photo_a, photo_c, photo_b ]
@@ -61,13 +65,13 @@ will maintain logical order based on the method used:
     
     
 
-Each photo that belongs to the user will automatically obtain a field called `user_position`. The field
+Each photo that belongs to the user will automatically obtain a field called `user_position`. The field name
 is derived from the foreign key of the relation, replacing "\_id" with "_position".
 
-The `has_many` relation of a user to their photos will automatically be ordered by `user_position` unless otherwise specified
+The `has_many` / `embeds_many` relationship of a user to their photos will automatically be ordered by `user_position` unless otherwise specified
 via the standard `order` option to the `has_many` macro. 
     
-## Advanced Usage - Has Many
+## Advanced Usage - Has Many / Embeds Many
 
     # Handles multiple has_many relations on same model!
     
