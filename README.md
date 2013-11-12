@@ -4,7 +4,7 @@
 [![Coverage Status](https://coveralls.io/repos/richardcalahan/mongoid_listable/badge.png?branch=master)](https://coveralls.io/r/richardcalahan/mongoid_listable?branch=master)
 [![Gem Version](https://badge.fury.io/rb/mongoid_listable.png)](http://badge.fury.io/rb/mongoid_listable)
 
-Mongoid Listable is a library for managing listable relations. It works great for isolated collections or for more complex `has_many` / `embeds_many` relationships.
+Mongoid Listable is a library for managing listable relations. It works great for non-relational collections or for more complex `has_many` / `embeds_many` relationships.
 
 There are two main macros:   
 
