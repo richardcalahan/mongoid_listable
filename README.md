@@ -12,7 +12,7 @@ There are two main macros:
 * `lists`  for `has_many` / `embeds_many` relationships.
 
 
-## Basic Usage - Isolated
+## Basic Usage - Non-Relational
 
     class Photo
       include Mongoid::Document
@@ -36,6 +36,10 @@ Non-relational lists can have as many listed contexts as needed. You'll need to 
       listed :scope :slideshow, field: :slideshow_position
 
     end
+    
+    # Photo.list orders by position field
+    # Photo.slideshow orders by slideshow_position
+    
     
 ## Basic Usage - Has Many / Embeds Many
 
