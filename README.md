@@ -8,7 +8,7 @@ Mongoid Listable is a library for managing listable relations. It works great fo
 
 There are two main macros:   
 
-* `listed` for isolated lists that do not belong to any parent objects.   
+* `listed` for non-relational lists that do not belong to any objects.   
 * `lists`  for `has_many` / `embeds_many` relationships.
 
 
@@ -23,7 +23,19 @@ There are two main macros:
     
 The `listed` macro will assign a `position` field and a `list` scope to the Photo class. All Photo instances that are
 created, destroyed, or have their position field updated will trigger a reording of all sibling instances. 
-    
+
+Non-relational lists can have as many listed contexts as needed. You'll need to specify both the `scope` and the
+`field` options in these cases.
+
+    class Photo
+
+      include Mongoid::Document
+      include Mongoid::Listable
+
+      listed :scope :list, field: :position
+      listed :scope :slideshow, field: :slideshow_position
+
+    end
     
 ## Basic Usage - Has Many / Embeds Many
 
