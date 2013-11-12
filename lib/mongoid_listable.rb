@@ -1,4 +1,1 @@
 require 'mongoid/listable'
-
-
-
