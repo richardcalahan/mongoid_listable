@@ -15,8 +15,7 @@ module Mongoid
         #
         # @since 0.1.0
         def created name
-          callback = "#{name}_#{__method__}"
-          define_method callback do
+          register_callback name, :before_create do 
             if position = send(name)
               objects = siblings(name).gte(name => position)
               reposition objects, name, position + 1
@@ -24,9 +23,6 @@ module Mongoid
               set name, siblings(name).count + 1
             end
           end
-
-          before_create callback
-          self
         end
 
         # Defines a mongoid before_update callback.        
@@ -40,12 +36,9 @@ module Mongoid
         #
         # @since 0.1.0
         def updated name
-          callback = "#{name}_#{__method__}"
-          define_method callback do       
+          register_callback name, :before_update do
             apply_change_on name if send("#{name}_changed?")
           end
-          before_update callback
-          self
         end
 
         # Defines a mongoid before_destroy callback.        
@@ -57,14 +50,10 @@ module Mongoid
         #
         # @since 0.1.0
         def destroyed name
-          callback = "#{name}_#{__method__}"
-          define_method callback do
+          register_callback name, :before_destroy do
             siblings = siblings(name).gt(name => send(name))
             reposition siblings, name, send(name)
           end
-
-          before_destroy callback
-          self
         end
 
         # Defines a mongoid 1-n relation after_add callback.
@@ -77,8 +66,7 @@ module Mongoid
         #
         # @since 0.0.6
         def added name, meta
-          callback = "#{name.to_s.singularize}_added"
-          define_method callback do |object|
+          register_callback name, :after_add do |object|
             return unless object.new_record?
             field_name = position_field_name meta
             if position = object.send(field_name) 
@@ -88,8 +76,6 @@ module Mongoid
               object.set field_name, many(name).count
             end
           end
-          meta[:after_add] = callback
-          self
         end
 
         # Defines a mongoid 1-n relation before_remove callback.
@@ -101,17 +87,25 @@ module Mongoid
         # @return [ Object ] self
         #
         # @since 0.0.6
-        def removed name, meta       
-          callback   = "#{name.to_s.singularize}_removed"
-          define_method callback do |object|
+        def removed name, meta                
+          register_callback name, :before_remove do |object|
             field_name = position_field_name meta
             objects    = object.siblings(field_name)
-            .gt(field_name => object.send(field_name))
+              .gt(field_name => object.send(field_name))
             reposition objects, field_name, object.send(field_name)
-            object.unset field_name
+            object.unset field_name            
           end
+        end
 
-          meta[:after_remove] = callback
+        private
+
+        def register_callback name, hook, &block
+          meta     = reflect_on_association name
+          callback = "#{hook}_#{name}" 
+
+          define_method callback, &block
+
+          meta ? meta[hook] = callback : send(hook, callback) 
           self
         end
 
@@ -127,11 +121,10 @@ module Mongoid
       # @since 0.1.0
       def apply_change_on name
         from, to = change_on name
-        siblings = siblings name
         if to > from
-          reposition siblings.between(name => from..to), name, from
+          reposition siblings(name).between(name => from..to), name, from
         elsif to < from       
-          reposition siblings.between(name => to..from), name, to + 1
+          reposition siblings(name).between(name => to..from), name, to + 1
         end
         set name, to
       end
