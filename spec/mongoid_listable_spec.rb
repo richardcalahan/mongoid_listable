@@ -10,90 +10,93 @@ describe Mongoid::Listable do
 
   describe 'listed' do 
 
+    FIELD = :custom_field
+    SCOPE = :custom_scope
+
     before :each do
       Item.destroy_all
       10.times { Item.create! }
-    end
+    end    
 
     after :each do 
-      ensure_order Item.list, :position
+      ensure_order Item.send(SCOPE), FIELD
     end
 
     it 'should have a position field' do 
-      expect(Item.fields.key?('position')).to be_true
+      expect(Item.fields.key?(FIELD.to_s)).to be_true
     end
 
     it 'should have a list scope' do 
-      expect(Item.scopes.key?(:list)).to be_true
+      expect(Item.scopes.key?(SCOPE)).to be_true
     end
 
     it 'should append new object at position 1' do
-      item = Item.create position: 1
-      expect(item.position).to eq(1)
+      item = Item.create FIELD => 1
+      expect(item.send(FIELD)).to eq(1)
     end
 
     it 'should append new object at position 5' do
-      item = Item.create position: 5
-      expect(item.position).to eq(5)
+      item = Item.create FIELD => 5
+      expect(item.send(FIELD)).to eq(5)
     end
 
     it 'should append new object at end of list' do
       item = Item.create
-      expect(item.position).to eq(11)
+      expect(item.send(FIELD)).to eq(11)
     end
 
     it 'should maintain order when removing object at position 1' do
-      Item.list.first.destroy
+      Item.send(SCOPE).first.destroy
     end
 
     it 'should maintain order when removing object at position 5' do
-      Item.where(position: 5).destroy
+      Item.where(FIELD => 5).destroy
     end
 
     it 'should maintain order when removing object at position 10' do
-      Item.list.last.destroy
+      Item.send(SCOPE).last.destroy
     end
 
     it 'should maintain order when moving object from position 1 to 5' do
-      item = Item.list.first
-      item.update_attribute :position, 5
-      expect(Item.list.where(position: 5).first).to eq(item)
+      item = Item.send(SCOPE).first
+      item.update_attribute FIELD, 5
+      expect(Item.send(SCOPE).where(FIELD => 5).first).to eq(item)
     end
 
     it 'should maintain order when moving object from position 10 to 5' do
-      item = Item.list.last
-      item.update_attribute :position, 5
-      expect(Item.list.where(position: 5).first).to eq(item)
+      item = Item.send(SCOPE).last
+      item.update_attribute FIELD, 5
+      expect(Item.send(SCOPE).where(FIELD => 5).first).to eq(item)
     end
 
     it 'should maintain order when moving object from position 2 to 6' do
-      item = Item.list.where(position: 2).first
-      item.update_attribute :position, 6
-      expect(Item.list.where(position: 6).first).to eq(item)
+      item = Item.send(SCOPE).where(FIELD => 2).first
+      item.update_attribute FIELD, 6
+      expect(Item.send(SCOPE).where(FIELD => 6).first).to eq(item)
     end
 
     it 'should maintain order when moving object from position 8 to 4' do
-      item = Item.list.where(position: 8).first
-      item.update_attribute :position, 4
-      expect(Item.list.where(position: 4).first).to eq(item)
+      item = Item.send(SCOPE).where(FIELD => 8).first
+      item.update_attribute FIELD, 4
+      expect(Item.send(SCOPE).where(FIELD => 4).first).to eq(item)
     end
 
     it 'should do nothing when assigning object to same position' do
-      item = Item.list.where(position: 5).first
-      item.update_attribute :position, 5
-      expect(Item.list.where(position: 5).first).to eq(item)
+      item = Item.send(SCOPE).where(FIELD => 5).first
+      item.update_attribute FIELD, 5
+      expect(Item.send(SCOPE).where(FIELD => 5).first).to eq(item)
     end
 
     it 'should compensate for updated positions that are higher than bounds' do
-      item = Item.list.where(position: 5).first
-      item.update_attribute :position, 100
-      expect(Item.list.last).to eq(item)
+      item = Item.send(SCOPE).where(FIELD => 5).first
+      item.update_attribute FIELD, 100
+      expect(Item.send(SCOPE).last).to eq(item)
     end
 
     it 'should compensate for updated positions that are lower than bounds' do
-      item = Item.list.where(position: 5).first
-      item.update_attribute :position, -100
-      expect(Item.list.first).to eq(item)
+      item = Item.send(SCOPE).where(FIELD => 5).first
+      item.update_attribute FIELD, -100
+      expect(Item.send(SCOPE).first).to eq(item)
     end
 
   end

@@ -15,14 +15,21 @@ module Mongoid
         # @return self
         #
         # @since 0.1.0
-        def listed
-          field :position, type: Integer
+        def listed options={}
+          config = { 
+            field: :position,
+            scope: :list 
+          }
 
-          created   :position
-          updated   :position
-          destroyed :position
+          config.merge! options
 
-          scope :list, order_by(:position => :asc)
+          field config[:field], type: Integer
+
+          created   config[:field]
+          updated   config[:field]
+          destroyed config[:field]
+
+          scope config[:scope], order_by(config[:field] => :asc)
 
           self
         end
