@@ -15,7 +15,7 @@ module Mongoid
         #
         # @since 0.1.0
         def created name
-          register_callback name, :before_create do 
+          register_callback name, :before_create do
             if position = send(name)
               objects = siblings(name).gte(name => position)
               reposition objects, name, position + 1
