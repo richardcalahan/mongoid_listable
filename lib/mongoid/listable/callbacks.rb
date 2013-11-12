@@ -9,7 +9,7 @@ module Mongoid
         # Defines a mongoid before_create callback.
         # Sets the position field to current object count + 1
         #
-        # @param [ Hash ] The configuration hash
+        # @param [ Symbol ] The name of the position field
         #
         # @return [ Object ] self
         #
@@ -17,10 +17,9 @@ module Mongoid
         def created name
           callback = "#{name}_#{__method__}"
           define_method callback do
-            position = send(name)
-            if position.present?
-              siblings = siblings name
-              reposition siblings.gte(name => position), name, position + 1
+            if position = send(name)
+              objects = siblings(name).gte(name => position)
+              reposition objects, name, position + 1
             else
               set name, siblings(name).count + 1
             end
@@ -35,7 +34,7 @@ module Mongoid
         # Hoe the change is applied varies depending on the redrection
         # of the update.
         #
-        # @param [ Hash ] The configuration hash
+        # @param [ Symbol ] The name of the position field
         #
         # @return [ Object ] self
         #
@@ -52,7 +51,7 @@ module Mongoid
         # Defines a mongoid before_destroy callback.        
         # Resets all sibling object's higher in the list
         #
-        # @param [ Hash ] The configuration hash
+        # @param [ Symbol ] The name of the position field
         #
         # @return [ Object ] self
         #
@@ -60,16 +59,15 @@ module Mongoid
         def destroyed name
           callback = "#{name}_#{__method__}"
           define_method callback do
-            position = send name
-            siblings = siblings(name).gt(name => position)
-            reposition siblings, name, position
+            siblings = siblings(name).gt(name => send(name))
+            reposition siblings, name, send(name)
           end
 
           before_destroy callback
           self
         end
 
-        # Defines a mongoid has_many relation after_add callback.
+        # Defines a mongoid 1-n relation after_add callback.
         # Sets the position attribute to current relations length + 1
         #
         # @param [ Symbol ]   name The name of the has_many relation
@@ -82,19 +80,19 @@ module Mongoid
           callback = "#{name.to_s.singularize}_added"
           define_method callback do |object|
             return unless object.new_record?
-            field_name = field_name(meta)
+            field_name = position_field_name meta
             if position = object.send(field_name) 
               objects = object.siblings(field_name).gte(field_name => position)
               reposition objects, field_name, position + 1
             else                       
-              object.set field_name, has_many_count(name)
+              object.set field_name, many(name).count
             end
           end
           meta[:after_add] = callback
           self
         end
 
-        # Defines a mongoid has_many relation before_remove callback.
+        # Defines a mongoid 1-n relation before_remove callback.
         # Resets the position index on all objects that came after
         #
         # @param [ Symbol ]   name The name of the has_many relation
@@ -106,10 +104,10 @@ module Mongoid
         def removed name, meta       
           callback   = "#{name.to_s.singularize}_removed"
           define_method callback do |object|
-            field_name = field_name meta
-            position = object.send field_name
-            reposition object.siblings(field_name).gt(field_name => position), 
-            field_name, position
+            field_name = position_field_name meta
+            objects    = object.siblings(field_name)
+            .gt(field_name => object.send(field_name))
+            reposition objects, field_name, object.send(field_name)
             object.unset field_name
           end
 
@@ -121,10 +119,10 @@ module Mongoid
 
       private
 
-      # Applies a position change on column. Which objects are repositioned
+      # Applies a position change on field. Which objects are repositioned
       # depends on the direction of the change.
       #
-      # @param [ Symbol ] name The name of position column
+      # @param [ Symbol ] name The name of position field
       #
       # @since 0.1.0
       def apply_change_on name

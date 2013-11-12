@@ -18,11 +18,12 @@ module Mongoid
         def listed
           field :position, type: Integer
 
-          created(:position)
-            .updated(:position)
-            .destroyed(:position)
+          created   :position
+          updated   :position
+          destroyed :position
 
           scope :list, order_by(:position => :asc)
+
           self
         end
 
@@ -34,19 +35,21 @@ module Mongoid
         # @return [ Mongoid:Relations:Metadata ] Instance of metadata
         #
         # @since 0.0.1
-        def lists name, options={}
-          meta = reflect_on_association name
+        def lists association, options={}
+          meta       = reflect_on_association association
+          field_name = determine_position_field_name meta
 
-          field_name = field_name(meta)
           meta.klass.send :field, field_name, type: Integer
 
-          ids_set(name, meta).set(name, meta)
-            .added(name, meta).removed(name, meta)
+          ids_set association, meta
+          set     association, meta
+          added   association, meta
+          removed association, meta
 
           meta.klass.send :include, Mongoid::Listable
           meta.klass.updated(field_name).destroyed(field_name)
 
-          meta[:order] ||= "#{field_name(meta)} asc"
+          meta[:order] ||= "#{field_name} asc"
         end
 
       end

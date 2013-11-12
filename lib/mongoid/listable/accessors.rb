@@ -21,7 +21,6 @@ module Mongoid
           redefine_method ids_method do |ids|            
             send meta.setter, meta.klass.find(ids).sort_by_attr(:id, ids)
           end
-
           self
         end
 
@@ -37,14 +36,13 @@ module Mongoid
         def set name, meta
           before_method "#{name}=" do |objects|
             objects ||= []
-
-            reposition objects, field_name(meta), 1
+            
+            reposition objects, position_field_name(meta), 1
 
             (send(name).to_a - objects).each do |object|
-              object.unset field_name(meta)
+              object.unset position_field_name(meta)
             end
           end
-
           self
         end
 

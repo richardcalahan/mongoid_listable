@@ -13,43 +13,29 @@ module Mongoid
       include Mongoid::Listable::Macros
     end
 
-    module ClassMethods
-
-      # Generates the position field name using the MetaData class
-      #
-      # @param [ MetaData ] meta The MetaData class
-      #
-      # @return Symbol
-      #
-      # @since 0.0.6
-      def field_name meta
-        (meta.foreign_key.to_s.gsub(/_?id$/, '_position')).to_sym
-      end
-
-    end
-
-    # Proxies to the class level version
+    # Proxies to the class level determine_position_field_name
     #
     # @param [ MetaData ] meta The MetaData class
     # @see Class.field_name
     #
     # @since 0.0.6
-    def field_name meta
-      self.class.field_name meta
+    def position_field_name meta
+      self.class.determine_position_field_name meta
     end
 
-    # Counts unique children of object
+    # Finds unique instances of objects for a given relation
     # Needed because the mongoid callbacks dont update
     # has_many relations until after invoked.
     #
     # @param [ Symbol ]   name The name of the has_many relation
     #
-    # @since 0.0.7
-    def has_many_count name
-      send(name).uniq(&:id).count
+    # @since 0.2.1
+    def many name
+      send(name).uniq(&:id)
     end
 
-    # Retrieves an object's list siblings
+    # Retrieves siblings of an object in a list. 
+    # Scoped by the position fiels name
     #
     # @return [ Array ]
     #
@@ -61,17 +47,32 @@ module Mongoid
 
     private
 
-    # Resets column on objects starting at 'start'
+    # Resets position field on objects starting at 'start'
     #
     # @param [ Array ] objects The objects to interate
-    # @param [ Symbol ] column The column to update
+    # @param [ Symbol ] column The field to update
     # @param [ Integer ] start The starting position
     #
     # @since 0.1.0
-    def reposition objects, column, start
+    def reposition objects, field, start
       objects.each_with_index do |object, index|
-        object.set column, start + index
+        object.set field, start + index
       end
+    end
+
+    module ClassMethods
+
+      # Generates the position field name using the MetaData instance
+      #
+      # @param [ MetaData ] meta The MetaData instance
+      #
+      # @return Symbol
+      #
+      # @since 0.2.1
+      def determine_position_field_name meta
+        (meta.foreign_key.to_s.gsub(/_?id$/, '_position')).to_sym
+      end
+
     end
 
   end
