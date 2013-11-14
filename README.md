@@ -19,7 +19,6 @@ There are two main macros:
       include Mongoid::Listable
       
       listed
-      
       ...
     end
     
@@ -62,7 +61,6 @@ Non-relational lists can have as many listed contexts as needed. You'll need to 
       
       belongs_to :user
       # or embedded_in :user
-      
       ...
     end
     
@@ -109,8 +107,7 @@ via the standard `order` option to the `has_many` macro.
       foreign_key: :kodaked_by_user_id
       
       lists :featured_photos
-      lists :kodak_moments
-      
+      lists :kodak_moments 
       ...
     end
     
@@ -126,7 +123,6 @@ via the standard `order` option to the `has_many` macro.
       class_name: 'User', 
       inverse_of: kodak_moments, 
       foreign_key: :kodaked_by_user_id
-      
       ...
     end
     
