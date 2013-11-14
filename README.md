@@ -52,7 +52,6 @@ Non-relational lists can have as many listed contexts as needed. You'll need to 
       # or embeds_many :photos
       
       lists :photos
-      
       ...
     end
     
