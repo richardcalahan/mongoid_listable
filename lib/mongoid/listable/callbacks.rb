@@ -99,14 +99,15 @@ module Mongoid
 
         private
         
-        # Registers a callback using name (either the position field, or 
-        # in the case of a has_many/embeds_many relationship, the relation name)
-        # as a unique identifier for the generated method name.
+        # Registers a callback using name (either the position 
+        # field, or in the case of a has_many/embeds_many relationship, 
+        # the relation name) as a unique identifier for the generated 
+        # method name.
         #
-        # If reflect_on_association(name) returns non-nil, we know this is a 
-        # has_many/embeds_many relationship, and we register the callback on 
-        # the inverse class of the relation. If the return value is nil, register
-        # the callback on the class itself. 
+        # If reflect_on_association(name) returns non-nil, we know 
+        # this is a has_many/embeds_many relationship, and we register 
+        # the callback on the inverse class of the relation. If the 
+        # return value is nil, register the callback on the class itself.
         #
         # @param [ Symbol ]        name  The name of the position field
         # @param [ Symbol|String ] hook  The name of the Mongoid relation callback
