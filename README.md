@@ -19,6 +19,7 @@ There are two main macros:
       include Mongoid::Listable
       
       listed
+      ...
     end
     
 The `listed` macro will assign a `position` field and a `list` scope to the Photo class. All Photo instances that are
@@ -28,17 +29,16 @@ Non-relational lists can have as many listed contexts as needed. You'll need to 
 `field` options in these cases.
 
     class Photo
-
       include Mongoid::Document
       include Mongoid::Listable
 
       listed :scope :list, field: :position
       listed :scope :slideshow, field: :slideshow_position
-
+      ...
     end
     
-    # Photo.list orders by position field
-    # Photo.slideshow orders by slideshow_position
+    Photo.list      # orders by position field
+    Photo.slideshow # orders by slideshow_position
     
     
 ## Basic Usage - Has Many / Embeds Many
@@ -82,8 +82,7 @@ will trigger a reordering of all sibling instances. For example:
     
 
 Each photo that belongs to the user will automatically obtain a field called `user_position`. The field name
-is derived from the foreign key of the relation, replacing "\_id" with "_position". Having a unique position key
-for each 1-n relationship allows for more complex lists.  
+is derived from the foreign key of the relation, replacing "\_id" with "_position".   
 
 The `has_many` / `embeds_many` relationship of a user to their photos will automadtically be ordered by `user_position` unless otherwise specified
 via the standard `order` option to the `has_many` macro. 
@@ -107,7 +106,7 @@ via the standard `order` option to the `has_many` macro.
       foreign_key: :kodaked_by_user_id
       
       lists :featured_photos
-      lists :kodak_moments
+      lists :kodak_moments 
       ...
     end
     

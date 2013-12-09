@@ -68,6 +68,3 @@ module Mongoid
 end
 
 ::Object.__send__ :include, Mongoid::Listable::Extensions::Object
-
-
-
