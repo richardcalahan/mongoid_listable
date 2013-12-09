@@ -41,8 +41,22 @@ module Mongoid
     #
     # @since 0.1.0
     def siblings field=:position
-      klass = embedded? ? _parent.send(metadata.key).class : self.class
+      klass = if embedded_one?
+                _parent.send(metadata.key).class
+              elsif embedded_many?
+                _parent.send(metadata.key)
+              else                
+                self.class
+              end
       klass.where(field.exists => true).ne id: id
+    end
+
+    def embedded_one?
+      embedded? && metadata[:relation] == Mongoid::Relations::Embedded::One
+    end
+
+    def embedded_many?
+      embedded? && metadata[:relation] == Mongoid::Relations::Embedded::Many
     end
 
     private
