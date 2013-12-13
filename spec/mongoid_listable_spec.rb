@@ -81,6 +81,15 @@ describe Mongoid::Listable do
       expect(Item.send(SCOPE).where(FIELD => 4).first).to eq(item)
     end
 
+    it 'should maintain order when moving two objects\' positions' do
+      item_1 = Item.send(SCOPE).where(FIELD => 8).first
+      item_2 = Item.send(SCOPE).where(FIELD => 9).first
+      item_1.update_attribute FIELD, 2
+      item_2.update_attribute FIELD, 6
+      expect(Item.send(SCOPE).where(FIELD => 2).first).to eq(item_1)
+      expect(Item.send(SCOPE).where(FIELD => 6).first).to eq(item_2)
+    end
+
     it 'should do nothing when assigning object to same position' do
       item = Item.send(SCOPE).where(FIELD => 5).first
       item.update_attribute FIELD, 5
@@ -95,10 +104,15 @@ describe Mongoid::Listable do
 
     it 'should compensate for updated positions that are lower than bounds' do
       item = Item.send(SCOPE).where(FIELD => 5).first
-      item.update_attribute FIELD, -100
+      item.update_attribute FIELD, 0
       expect(Item.send(SCOPE).first).to eq(item)
     end
 
+    it 'should compensate for updated positions that are nil' do 
+      item = Item.send(SCOPE).where(FIELD => 5).first
+      item.update_attribute FIELD, nil
+      expect(Item.send(SCOPE).last).to eq(item)
+    end
   end
 
   describe 'lists' do
@@ -201,6 +215,12 @@ describe Mongoid::Listable do
         section = Article.first.sections.where(article_position: 5).first
         section.update_attribute :article_position, -100
         expect(Article.first.sections.first).to eq(section)
+      end
+
+      it 'should compensate for updated positions that are nil' do 
+        section = Article.first.sections.where(article_position: 5).first
+        section.update_attribute :article_position, nil
+        expect(Article.first.sections.last).to eq(section)
       end
       
     end
@@ -319,6 +339,12 @@ describe Mongoid::Listable do
         photo = User.first.photos.where(user_position: 5).first
         photo.update_attribute :user_position, -100
         expect(User.first.photos.first).to eq(photo)
+      end
+
+      it 'should compensate for updated positions that are nil' do 
+        photo = User.first.photos.where(user_position: 5).first
+        photo.update_attribute :user_position, nil
+        expect(User.first.photos.last).to eq(photo)
       end
 
     end

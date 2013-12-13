@@ -154,7 +154,8 @@ module Mongoid
       # @since 0.1.0
       def change_on name
         from, to = send "#{name}_change"
-        from ||= 0
+        from ||= siblings(name).count
+        to ||= siblings(name).count + 1
         to = if to > siblings(name).count + 1
                siblings(name).count + 1
              elsif to < 1

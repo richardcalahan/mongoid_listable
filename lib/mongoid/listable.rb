@@ -48,7 +48,7 @@ module Mongoid
               else                
                 self.class
               end
-      klass.where(field.exists => true).ne id: id
+      klass.where(field.exists => true).ne(id: id)
     end
 
     def embedded_one?
@@ -68,7 +68,7 @@ module Mongoid
     # @param [ Integer ] start The starting position
     #
     # @since 0.1.0
-    def reposition objects, field, start
+    def reposition objects, field, start      
       objects.each_with_index do |object, index|
         object.set field, start + index
       end
